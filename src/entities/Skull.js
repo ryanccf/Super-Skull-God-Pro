@@ -35,8 +35,6 @@ class Skull {
             fontFamily: 'Arial Black',
             fontSize: isBig ? 20 : 16,
             color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: isBig ? 3 : 2,
             fixedWidth: 0
         }).setOrigin(0.5).setDepth(10);
         

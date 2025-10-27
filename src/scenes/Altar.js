@@ -37,31 +37,38 @@ class Altar extends Phaser.Scene {
     createSkullCountDisplay() {
         const totalSkulls = this.registry.get('totalSkulls');
 
+        // White backdrop for skull count
+        const skullBackdrop = this.add.graphics();
+        skullBackdrop.fillStyle(0xffffff, 0.9);
+        skullBackdrop.fillRoundedRect(GAME_CONFIG.WORLD_WIDTH - 480, 20, 460, 60, 12);
+
         this.add.text(GAME_CONFIG.WORLD_WIDTH - 32, 32, `Total Skulls: ${totalSkulls}`, {
             fontFamily: 'Arial Black',
             fontSize: 38,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 4
+            color: '#000000'
         }).setOrigin(1, 0);
     }
 
     createFlavorText() {
-        const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
-        const rightSideX = centerX + (GAME_CONFIG.WORLD_WIDTH - centerX) / 2;
+        const padding = 32;
+        const rightX = GAME_CONFIG.WORLD_WIDTH - padding;
+        const textWidth = 480;
 
-        this.add.text(rightSideX, 100,
+        // White backdrop for flavor text
+        const flavorBackdrop = this.add.graphics();
+        flavorBackdrop.fillStyle(0xffffff, 0.9);
+        flavorBackdrop.fillRoundedRect(rightX - textWidth, 90, textWidth, 100, 12);
+
+        this.add.text(rightX - 16, 100,
             "Resurrect the 4 Skull Masters\nto beckon the Skull God's return\nto the material plane!",
             {
                 fontFamily: 'Arial Black',
                 fontSize: 20,
                 color: '#000000',
-                stroke: '#ffffff',
-                strokeThickness: 3,
-                align: 'center',
+                align: 'right',
                 wordWrap: { width: 400 }
             }
-        ).setOrigin(0.5, 0);
+        ).setOrigin(1, 0);
     }
 
     createUnlockablesList() {
@@ -114,9 +121,7 @@ class Altar extends Phaser.Scene {
                 const priceText = this.add.text(0, thumbnailSize/2 + 15, `${cost} Skulls`, {
                     fontFamily: 'Arial Black',
                     fontSize: 14,
-                    color: '#000000',
-                    stroke: '#ffffff',
-                    strokeThickness: 2
+                    color: '#000000'
                 }).setOrigin(0.5);
                 container.add(priceText);
 
@@ -177,13 +182,16 @@ class Altar extends Phaser.Scene {
             this.scene.pause();
         });
 
+        // White backdrop for ability label
+        const abilityBackdrop = this.add.graphics();
+        abilityBackdrop.fillStyle(0xffffff, 0.9);
+        abilityBackdrop.fillRoundedRect(knightX - 120, knightY + knightSize / 2 + 8, 240, 40, 12);
+
         // Add ability label below the knight
         this.add.text(knightX, knightY + knightSize / 2 + 20, 'Adds 2X Fast Forward', {
             fontFamily: 'Arial Black',
             fontSize: 18,
             color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3,
             align: 'center'
         }).setOrigin(0.5);
     }
@@ -206,9 +214,7 @@ class Altar extends Phaser.Scene {
         const buttonText = this.add.text(centerX, buttonY, `PRAY (${cost} Skulls)`, {
             fontFamily: 'Arial Black',
             fontSize: 24,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0.5);
 
         if (canAfford) {
@@ -240,9 +246,7 @@ class Altar extends Phaser.Scene {
         const buttonText = this.add.text(centerX, buttonY, 'BACK', {
             fontFamily: 'Arial Black',
             fontSize: 20,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 2
+            color: '#000000'
         }).setOrigin(0.5);
 
         button.on('pointerdown', () => this.scene.start('MainMenu'));

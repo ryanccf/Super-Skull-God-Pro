@@ -29,22 +29,28 @@ class Lightbox extends Phaser.Scene {
         const scale = Math.min(scaleX, scaleY);
         image.setScale(scale);
 
+        // White backdrop for item name
+        const nameBackdrop = this.add.graphics();
+        nameBackdrop.fillStyle(0xffffff, 0.9);
+        nameBackdrop.fillRoundedRect(centerX - 300, 20, 600, 60, 12);
+
         // Add item name text
         this.add.text(centerX, 50, this.itemName, {
             fontFamily: 'Arial Black',
             fontSize: 48,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 6
+            color: '#000000'
         }).setOrigin(0.5);
+
+        // White backdrop for close instruction
+        const closeBackdrop = this.add.graphics();
+        closeBackdrop.fillStyle(0xffffff, 0.9);
+        closeBackdrop.fillRoundedRect(centerX - 200, GAME_CONFIG.WORLD_HEIGHT - 70, 400, 40, 12);
 
         // Add close instruction
         this.add.text(centerX, GAME_CONFIG.WORLD_HEIGHT - 50, 'Click anywhere to close', {
             fontFamily: 'Arial Black',
             fontSize: 24,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0.5);
     }
 

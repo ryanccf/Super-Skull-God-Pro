@@ -31,15 +31,18 @@ class MainMenu extends Phaser.Scene {
         const textStyle = {
             fontFamily: 'Arial Black',
             fontSize: 38,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 4
+            color: '#000000'
         };
+
+        // White backdrop for stats
+        const statsBackdrop = this.add.graphics();
+        statsBackdrop.fillStyle(0xffffff, 0.9);
+        statsBackdrop.fillRoundedRect(20, 20, 550, 100, 12);
 
         const totalSkullsText = this.add.text(32, 32, `Total Skulls: ${totalSkulls}`, textStyle);
         const bestRoundText = this.add.text(32, 80, `Best Round: ${highscore}`, textStyle);
 
-        this.addFloatingAnimation([totalSkullsText, bestRoundText]);
+        this.addFloatingAnimation([statsBackdrop, totalSkullsText, bestRoundText]);
 
         const instructions = [
             "SUPER SKULL GOD PRO",
@@ -56,16 +59,20 @@ class MainMenu extends Phaser.Scene {
 
         // Position text in the center of the right third of the screen
         const rightThirdCenterX = GAME_CONFIG.WORLD_WIDTH * (5/6);
+
+        // White backdrop for instructions
+        const instructionBackdrop = this.add.graphics();
+        instructionBackdrop.fillStyle(0xffffff, 0.9);
+        instructionBackdrop.fillRoundedRect(rightThirdCenterX - 250, 200, 500, 400, 12);
+
         const instructionText = this.add.text(rightThirdCenterX, 400, instructions, {
             fontFamily: 'Arial Black',
             fontSize: 28,
             color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3,
             align: 'center'
         }).setOrigin(0.5);
 
-        this.addPulseAnimation(instructionText);
+        this.addPulseAnimation([instructionBackdrop, instructionText]);
 
         this.createButton(centerX - 384, 650, 'PLAY', 0xFF6347, () => this.scene.start('ClickerGame'));
         this.createButton(centerX - 128, 650, 'SHOP', COLORS.MINT_GREEN, () => this.scene.start('Shop'));
@@ -84,9 +91,7 @@ class MainMenu extends Phaser.Scene {
         const buttonText = this.add.text(x, y, text, {
             fontFamily: 'Arial Black',
             fontSize: 28,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0.5);
 
         GameUtils.addButtonEffect(buttonBg, buttonText, callback);
@@ -121,11 +126,7 @@ class MainMenu extends Phaser.Scene {
             if (this.sound.context && this.sound.context.state === 'suspended') {
                 this.sound.context.resume();
             }
-
-            if (currentlyOver.length === 0) {
-                this.pauseAutoStartTimer();
-                this.scene.start('ClickerGame');
-            }
+            // Removed: click anywhere to start functionality
         });
 
         // Add P key listener for testing
@@ -139,6 +140,12 @@ class MainMenu extends Phaser.Scene {
     createAutoStartUI() {
         const topRightX = GAME_CONFIG.WORLD_WIDTH - 30;
         const topRightY = 30;
+
+        // White backdrop for auto-start UI
+        const autoStartBackdrop = this.add.graphics();
+        autoStartBackdrop.fillStyle(0xffffff, 0.9);
+        autoStartBackdrop.fillRoundedRect(topRightX - 180, topRightY - 10, 180, 70, 12);
+        autoStartBackdrop.setDepth(1);
 
         // Checkbox background
         const checkboxSize = 24;
@@ -158,18 +165,14 @@ class MainMenu extends Phaser.Scene {
         this.autoStartLabel = this.add.text(topRightX - 100, topRightY + 12, 'Auto-Start', {
             fontFamily: 'Arial Black',
             fontSize: 18,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0, 0.5).setDepth(2);
 
         // Countdown timer (below checkbox)
         this.autoStartTimerText = this.add.text(topRightX - 77, topRightY + 30, '', {
             fontFamily: 'Arial Black',
             fontSize: 16,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0.5, 0).setDepth(2);
 
         // Make checkbox interactive

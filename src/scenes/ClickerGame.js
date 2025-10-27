@@ -189,19 +189,21 @@ class ClickerGame extends Phaser.Scene {
         const textStyle = {
             fontFamily: 'Arial Black',
             fontSize: 32,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 4
+            color: '#000000'
         };
+
+        // White backdrop for score display
+        const scoreBackdrop = this.add.graphics();
+        scoreBackdrop.fillStyle(0xffffff, 0.9);
+        scoreBackdrop.fillRoundedRect(sidebarX - 10, 25, 280, 220, 12);
+        scoreBackdrop.setDepth(0);
 
         this.roundScoreText = this.add.text(sidebarX, 100, `Round: ${this.roundScore}`, textStyle).setDepth(1);
         this.totalSkullsText = this.add.text(sidebarX, 160, `Total: ${this.totalSkulls}`, textStyle).setDepth(1);
         this.maxSkullsText = this.add.text(sidebarX, 220, `Max: ${this.maxSkulls}`, {
             fontFamily: 'Arial Black',
             fontSize: 28,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 4
+            color: '#000000'
         }).setDepth(1);
         this.timeText = this.add.text(sidebarX, 40, `Time: ${this.gameTime}`, textStyle).setDepth(1);
 
@@ -231,9 +233,7 @@ class ClickerGame extends Phaser.Scene {
         this.fastForwardLabel = this.add.text(topRightX - 40, topRightY + 15, '2X', {
             fontFamily: 'Arial Black',
             fontSize: 20,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0.5).setDepth(2);
 
         // Make button interactive
@@ -278,6 +278,12 @@ class ClickerGame extends Phaser.Scene {
         const topRightX = GAME_CONFIG.WORLD_WIDTH - 30;
         const topRightY = 30;
 
+        // White backdrop for auto-start UI
+        const autoStartBackdrop = this.add.graphics();
+        autoStartBackdrop.fillStyle(0xffffff, 0.9);
+        autoStartBackdrop.fillRoundedRect(topRightX - 180, topRightY - 10, 180, 50, 12);
+        autoStartBackdrop.setDepth(1);
+
         // Checkbox background
         const checkboxSize = 24;
         this.autoStartCheckbox = this.add.graphics();
@@ -296,9 +302,7 @@ class ClickerGame extends Phaser.Scene {
         this.autoStartLabel = this.add.text(topRightX - 100, topRightY + 12, 'Auto-Start', {
             fontFamily: 'Arial Black',
             fontSize: 18,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0, 0.5).setDepth(2);
 
         // Make checkbox interactive
@@ -624,9 +628,7 @@ class ClickerGame extends Phaser.Scene {
                 const label = this.add.text(pos.x, pos.y, pairNumber.toString(), {
                     fontFamily: 'Arial Black',
                     fontSize: 16,
-                    color: '#000000',
-                    stroke: '#ffffff',
-                    strokeThickness: 3
+                    color: '#000000'
                 }).setOrigin(0.5);
                 label.setDepth(101);
                 portal.numberLabel = label;
@@ -1579,9 +1581,7 @@ class ClickerGame extends Phaser.Scene {
         const bonusText = this.add.text(x, y - 30, `+${value}!`, {
             fontFamily: 'Arial Black',
             fontSize: value > 10 ? 36 : 24,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: value > 10 ? 4 : 2
+            color: '#000000'
         }).setOrigin(0.5);
 
         this.tweens.add({
@@ -1599,9 +1599,7 @@ class ClickerGame extends Phaser.Scene {
         const bonusText = this.add.text(x, y - 40, `+${value}!`, {
             fontFamily: 'Arial Black',
             fontSize: 20,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 2
+            color: '#000000'
         }).setOrigin(0.5);
 
         this.tweens.add({
@@ -1631,9 +1629,7 @@ class ClickerGame extends Phaser.Scene {
         const bonusText = this.add.text(bumper.x, bumper.y - 30, '2x!', {
             fontFamily: 'Arial Black',
             fontSize: 20,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 2
+            color: '#000000'
         }).setOrigin(0.5);
 
         this.tweens.add({
@@ -1680,9 +1676,7 @@ class ClickerGame extends Phaser.Scene {
         const flipText = this.add.text(flipper.x, flipper.y + 20, 'FLIP!', {
             fontFamily: 'Arial Black',
             fontSize: 18,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 2
+            color: '#000000'
         }).setOrigin(0.5);
 
         this.tweens.add({

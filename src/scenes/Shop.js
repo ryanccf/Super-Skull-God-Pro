@@ -30,28 +30,27 @@ class Shop extends Phaser.Scene {
         const maxSkulls = this.registry.get('maxSkulls');
         const gameTime = this.registry.get('gameTime');
 
+        // White backdrop for header
+        const headerBackdrop = this.add.graphics();
+        headerBackdrop.fillStyle(0xffffff, 0.9);
+        headerBackdrop.fillRoundedRect(centerX - 350, 30, 700, 150, 12);
+
         this.add.text(centerX, 60, 'SKULL SHOP', {
             fontFamily: 'Arial Black',
             fontSize: 48,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 6
+            color: '#000000'
         }).setOrigin(0.5);
 
         this.add.text(centerX, 120, `Your Skulls: ${totalSkulls}`, {
             fontFamily: 'Arial Black',
             fontSize: 28,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 4
+            color: '#000000'
         }).setOrigin(0.5);
 
         this.add.text(centerX, 160, `Max Skulls: ${maxSkulls} | Game Time: ${gameTime}s`, {
             fontFamily: 'Arial Black',
             fontSize: 28,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 4
+            color: '#000000'
         }).setOrigin(0.5);
     }
 
@@ -247,8 +246,6 @@ class Shop extends Phaser.Scene {
             fontFamily: 'Arial Black',
             fontSize: 18,
             color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 2,
             align: 'center'
         }).setOrigin(0.5);
 
@@ -275,9 +272,7 @@ class Shop extends Phaser.Scene {
         const buttonText = this.add.text(x, y, text, {
             fontFamily: 'Arial Black',
             fontSize: 20,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 2
+            color: '#000000'
         }).setOrigin(0.5);
 
         button.on('pointerdown', callback);

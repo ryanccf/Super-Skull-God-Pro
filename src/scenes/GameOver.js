@@ -64,6 +64,12 @@ class GameOver extends Phaser.Scene {
         const topRightX = GAME_CONFIG.WORLD_WIDTH - 30;
         const topRightY = 30;
 
+        // White backdrop for auto-start UI
+        const autoStartBackdrop = this.add.graphics();
+        autoStartBackdrop.fillStyle(0xffffff, 0.9);
+        autoStartBackdrop.fillRoundedRect(topRightX - 180, topRightY - 10, 180, 70, 12);
+        autoStartBackdrop.setDepth(1);
+
         // Checkbox background
         const checkboxSize = 24;
         this.autoStartCheckbox = this.add.graphics();
@@ -82,18 +88,14 @@ class GameOver extends Phaser.Scene {
         this.autoStartLabel = this.add.text(topRightX - 100, topRightY + 12, 'Auto-Start', {
             fontFamily: 'Arial Black',
             fontSize: 18,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0, 0.5).setDepth(2);
 
         // Countdown timer (below checkbox)
         this.autoStartTimerText = this.add.text(topRightX - 77, topRightY + 30, '', {
             fontFamily: 'Arial Black',
             fontSize: 16,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 3
+            color: '#000000'
         }).setOrigin(0.5, 0).setDepth(2);
 
         // Make checkbox interactive
