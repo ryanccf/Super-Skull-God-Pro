@@ -54,13 +54,23 @@ class Preloader extends Phaser.Scene {
         this.load.image('game_background', 'src/assets/images/backgrounds/game_background.png');
         this.load.image('game_over_background', 'src/assets/images/backgrounds/game_over_background.png');
 
-        // Load unlockables
-        UNLOCKABLES.forEach(name => {
+        // Load unlockables for both characters
+        CHARACTER_UNLOCKABLES['Skull Knight'].forEach(name => {
             this.load.image(name, `src/assets/images/unlockables/Character001/${name}.png`);
         });
 
-        // Load rewards
+        CHARACTER_UNLOCKABLES['Skull Shamaness'].forEach(name => {
+            this.load.image(name, `src/assets/images/unlockables/Character002/${name}.png`);
+        });
+
+        // Load character rewards
         this.load.image('Skull Knight', 'src/assets/images/rewards/Skull Knight.png');
+        this.load.image('Skull Shamaness', 'src/assets/images/rewards/Skull Shamaness.png');
+
+        // Load card system assets
+        this.load.image('booster_pack', 'src/assets/images/cards/Skull God Pack.png');
+        this.load.image('card_back', 'src/assets/images/cards/card_back.png');
+        this.load.image('card_face', 'src/assets/images/cards/CardFace.png');
     }
 
     create() {

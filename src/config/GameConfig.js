@@ -13,21 +13,45 @@ const GAME_CONFIG = {
     }
 };
 
-const UNLOCKABLES = [
-    'Skull Helm',
-    'Skull Dagger',
-    'Skull Gauntlets',
-    'Skull Breastplate',
-    'Skull Skirt',
-    'Skull Boots',
-    'Skull Shoulderpads',
-    'Skull Shield',
-    'Skull Belt',
-    'Skull Bow',
-    'Skull Quiver',
-    'Skull Sword',
-    'Skeleton Warrior'
+const CHARACTER_UNLOCKABLES = {
+    'Skull Knight': [
+        'Skull Helm',
+        'Skull Dagger',
+        'Skull Gauntlets',
+        'Skull Breastplate',
+        'Skull Skirt',
+        'Skull Boots',
+        'Skull Shoulderpads',
+        'Skull Shield',
+        'Skull Belt',
+        'Skull Bow',
+        'Skull Quiver',
+        'Skull Sword'
+    ],
+    'Skull Shamaness': [
+        'Skull Headdress',
+        'Skull Dress',
+        'Skull Potion',
+        'Skull Staff',
+        'Skull Scimitar',
+        'Skull Necklace',
+        'Skull Bodice',
+        'Skull Bra',
+        'Skull Bikini',
+        'Skull Midriff Belt',
+        'Skull Bracer',
+        'Skull Lipstick'
+    ]
+};
+
+// Flat list of all unlockables for easy lookup
+const ALL_UNLOCKABLES = [
+    ...CHARACTER_UNLOCKABLES['Skull Knight'],
+    ...CHARACTER_UNLOCKABLES['Skull Shamaness']
 ];
+
+// For backwards compatibility
+const UNLOCKABLES = ALL_UNLOCKABLES;
 
 const DEFAULT_SAVE_DATA = {
     totalSkulls: 200,
