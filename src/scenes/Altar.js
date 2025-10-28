@@ -7,7 +7,13 @@ class Altar extends Phaser.Scene {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
 
-        this.add.image(centerX, centerY, 'background');
+        // Use custom altar background
+        const bg = this.add.image(centerX, centerY, 'altar_background');
+        // Scale to cover the entire screen
+        const scaleX = GAME_CONFIG.WORLD_WIDTH / bg.width;
+        const scaleY = GAME_CONFIG.WORLD_HEIGHT / bg.height;
+        const scale = Math.max(scaleX, scaleY);
+        bg.setScale(scale);
 
         // Add black square
         const squareSize = 300;
@@ -192,6 +198,11 @@ class Altar extends Phaser.Scene {
         this.lightboxImage.setDepth(1001);
         this.lightboxImage.setVisible(false);
 
+        // Card face overlay - depth 1001.5 (between image and text)
+        this.lightboxCardFace = this.add.image(centerX, centerY, 'card_face');
+        this.lightboxCardFace.setDepth(1001.5);
+        this.lightboxCardFace.setVisible(false);
+
         // White backdrop for item name - depth 1002
         this.lightboxNameBackdrop = this.add.graphics();
         this.lightboxNameBackdrop.fillStyle(0xffffff, 0.9);
@@ -208,21 +219,31 @@ class Altar extends Phaser.Scene {
         this.lightboxNameText.setDepth(1003);
         this.lightboxNameText.setVisible(false);
 
-        // White backdrop for close instruction - depth 1002
-        this.lightboxCloseBackdrop = this.add.graphics();
-        this.lightboxCloseBackdrop.fillStyle(0xffffff, 0.9);
-        this.lightboxCloseBackdrop.fillRoundedRect(centerX - 200, GAME_CONFIG.WORLD_HEIGHT - 70, 400, 40, 12);
-        this.lightboxCloseBackdrop.setDepth(1002);
-        this.lightboxCloseBackdrop.setVisible(false);
+        // Character indicator background (circular) - depth 1002
+        this.lightboxCharacterBg = this.add.graphics();
+        this.lightboxCharacterBg.setDepth(1002);
+        this.lightboxCharacterBg.setVisible(false);
 
-        // Close instruction text - depth 1003
-        this.lightboxCloseText = this.add.text(centerX, GAME_CONFIG.WORLD_HEIGHT - 50, 'Click anywhere to close', {
-            fontFamily: 'Arial Black',
-            fontSize: 24,
-            color: '#000000'
-        }).setOrigin(0.5);
-        this.lightboxCloseText.setDepth(1003);
-        this.lightboxCloseText.setVisible(false);
+        // Character indicator icon - depth 1003
+        this.lightboxCharacterIcon = this.add.image(0, 0, 'card_back');
+        this.lightboxCharacterIcon.setDepth(1003);
+        this.lightboxCharacterIcon.setVisible(false);
+
+        // Card text backdrop - depth 1002
+        this.lightboxTextBackdrop = this.add.graphics();
+        this.lightboxTextBackdrop.setDepth(1002);
+        this.lightboxTextBackdrop.setVisible(false);
+
+        // Card text - depth 1003
+        this.lightboxCardText = this.add.text(centerX, 0, '', {
+            fontFamily: 'Arial',
+            fontSize: 18,
+            color: '#000000',
+            align: 'center',
+            wordWrap: { width: 350 }
+        }).setOrigin(0.5, 0);
+        this.lightboxCardText.setDepth(1003);
+        this.lightboxCardText.setVisible(false);
 
         // Track if lightbox is open
         this.lightboxIsOpen = false;
@@ -249,6 +270,14 @@ class Altar extends Phaser.Scene {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
 
+        // Determine which character this item belongs to
+        let characterName = null;
+        if (CHARACTER_UNLOCKABLES['Skull Knight'].includes(itemName)) {
+            characterName = 'Skull Knight';
+        } else if (CHARACTER_UNLOCKABLES['Skull Shamaness'].includes(itemName)) {
+            characterName = 'Skull Shamaness';
+        }
+
         // Update the text
         this.lightboxNameText.setText(itemName);
 
@@ -256,21 +285,70 @@ class Altar extends Phaser.Scene {
         this.lightboxImage.setTexture(itemName);
         this.lightboxImage.setPosition(centerX, centerY);
 
-        // Scale image to fit screen while maintaining aspect ratio
-        const maxWidth = GAME_CONFIG.WORLD_WIDTH * 0.8;
-        const maxHeight = GAME_CONFIG.WORLD_HEIGHT * 0.8;
-        const scaleX = maxWidth / this.lightboxImage.width;
-        const scaleY = maxHeight / this.lightboxImage.height;
-        const scale = Math.min(scaleX, scaleY);
+        // Calculate card dimensions - portrait orientation (1.4 aspect ratio like standard cards)
+        const maxHeight = GAME_CONFIG.WORLD_HEIGHT * 0.7;
+        const cardWidth = maxHeight / 1.4;
+        const cardHeight = maxHeight;
+
+        // Calculate scale and crop to fit card dimensions (portrait)
+        const desiredHeight = cardHeight * 0.85; // Leave room for card frame
+        const scale = desiredHeight / this.lightboxImage.height;
+        const cropWidth = cardWidth / scale;
+        const cropHeight = this.lightboxImage.height;
+        const cropX = Math.max(0, (this.lightboxImage.width - cropWidth) / 2);
+
+        // Crop the center portion of the square image
+        this.lightboxImage.setCrop(cropX, 0, cropWidth, cropHeight);
         this.lightboxImage.setScale(scale);
+
+        // Position and scale the card face to match
+        this.lightboxCardFace.setPosition(centerX, centerY);
+        this.lightboxCardFace.setDisplaySize(cardWidth, cardHeight);
+
+        // Add character indicator in bottom right
+        if (characterName) {
+            const indicatorSize = 80;
+            const indicatorX = centerX + cardWidth / 2 - indicatorSize / 2 - 10;
+            const indicatorY = centerY + cardHeight / 2 - indicatorSize / 2 - 10;
+
+            // Draw circular background
+            this.lightboxCharacterBg.clear();
+            this.lightboxCharacterBg.fillStyle(0xffffff, 0.9);
+            this.lightboxCharacterBg.fillCircle(indicatorX, indicatorY, indicatorSize / 2);
+            this.lightboxCharacterBg.lineStyle(2, 0x000000);
+            this.lightboxCharacterBg.strokeCircle(indicatorX, indicatorY, indicatorSize / 2);
+            this.lightboxCharacterBg.setVisible(true);
+
+            // Set character icon
+            this.lightboxCharacterIcon.setTexture(characterName);
+            this.lightboxCharacterIcon.setPosition(indicatorX, indicatorY);
+            const iconScale = (indicatorSize * 0.8) / this.lightboxCharacterIcon.height;
+            this.lightboxCharacterIcon.setScale(iconScale);
+            this.lightboxCharacterIcon.setVisible(true);
+        }
+
+        // Add card text at bottom
+        const cardText = CARD_TEXT[itemName] || 'No description available.';
+        this.lightboxCardText.setText(cardText);
+        const textY = centerY + cardHeight / 2 + 20;
+        this.lightboxCardText.setPosition(centerX, textY);
+
+        // Calculate text backdrop size
+        const textHeight = this.lightboxCardText.height;
+        const textBackdropHeight = textHeight + 30;
+
+        this.lightboxTextBackdrop.clear();
+        this.lightboxTextBackdrop.fillStyle(0xffffff, 0.9);
+        this.lightboxTextBackdrop.fillRoundedRect(centerX - 200, textY - 15, 400, textBackdropHeight, 12);
+        this.lightboxTextBackdrop.setVisible(true);
+        this.lightboxCardText.setVisible(true);
 
         // Show all lightbox elements
         this.lightboxOverlayGraphics.setVisible(true);
         this.lightboxImage.setVisible(true);
+        this.lightboxCardFace.setVisible(true);
         this.lightboxNameBackdrop.setVisible(true);
         this.lightboxNameText.setVisible(true);
-        this.lightboxCloseBackdrop.setVisible(true);
-        this.lightboxCloseText.setVisible(true);
 
         this.lightboxIsOpen = true;
         this.lightboxCanClose = false; // Don't allow closing yet
@@ -296,10 +374,13 @@ class Altar extends Phaser.Scene {
         // Hide all lightbox elements
         this.lightboxOverlayGraphics.setVisible(false);
         this.lightboxImage.setVisible(false);
+        this.lightboxCardFace.setVisible(false);
         this.lightboxNameBackdrop.setVisible(false);
         this.lightboxNameText.setVisible(false);
-        this.lightboxCloseBackdrop.setVisible(false);
-        this.lightboxCloseText.setVisible(false);
+        this.lightboxCharacterBg.setVisible(false);
+        this.lightboxCharacterIcon.setVisible(false);
+        this.lightboxTextBackdrop.setVisible(false);
+        this.lightboxCardText.setVisible(false);
 
         this.lightboxIsOpen = false;
         this.lightboxCanClose = false;
@@ -396,13 +477,13 @@ class Altar extends Phaser.Scene {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
         const squareSize = 300;
-        const squareY = centerY - 180;
 
-        // Position to the right of the altar
+        // Position to the right of the altar, below the flavor text
         const altarRightEdge = centerX + squareSize / 2;
         const characterSize = 220;
         const padding = 70;
         const characterSpacing = 240;
+        const characterY = 300; // Position below flavor text (which ends around y: 190)
 
         // Check if Skull Knight is unlocked (all 12 items)
         const knightUnlocked = CHARACTER_UNLOCKABLES['Skull Knight'].every(item =>
@@ -412,7 +493,7 @@ class Altar extends Phaser.Scene {
         if (knightUnlocked) {
             this.createCharacterCard(
                 altarRightEdge + padding + characterSize / 2,
-                squareY,
+                characterY,
                 characterSize,
                 'Skull Knight',
                 'Adds 2X Fast Forward'
@@ -427,7 +508,7 @@ class Altar extends Phaser.Scene {
         if (shamanessUnlocked) {
             this.createCharacterCard(
                 altarRightEdge + padding + characterSize / 2 + characterSpacing,
-                squareY,
+                characterY,
                 characterSize,
                 'Skull Shamaness',
                 'Mystical Powers'
@@ -530,38 +611,216 @@ class Altar extends Phaser.Scene {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
 
+        // Disable back button during pack opening
+        this.disableBackButton();
+
+        // Track pack opening state for click-to-advance
+        this.packOpeningState = {
+            phase: 'dropping', // dropping -> clicked -> flipping -> done
+            overlay: null,
+            boosterPack: null,
+            cards: null,
+            cardContainers: [],
+            currentCardIndex: 0,
+            activeTweens: [],
+            activeTimers: [],
+            skullEmitter: null
+        };
+
         // Dim the background
         const overlay = this.add.graphics();
         overlay.fillStyle(0x000000, 0.7);
         overlay.fillRect(0, 0, GAME_CONFIG.WORLD_WIDTH, GAME_CONFIG.WORLD_HEIGHT);
         overlay.setDepth(100);
+        this.packOpeningState.overlay = overlay;
+
+        // Make overlay clickable to advance through pack opening
+        overlay.setInteractive(new Phaser.Geom.Rectangle(0, 0, GAME_CONFIG.WORLD_WIDTH, GAME_CONFIG.WORLD_HEIGHT), Phaser.Geom.Rectangle.Contains);
+        overlay.on('pointerdown', () => this.advancePackOpening());
 
         // Create booster pack off-screen (above)
         const boosterPack = this.add.image(centerX, -200, 'booster_pack');
         boosterPack.setScale(0.5);
         boosterPack.setDepth(101);
+        this.packOpeningState.boosterPack = boosterPack;
 
         // Animate booster pack dropping from top
-        this.tweens.add({
+        const dropTween = this.tweens.add({
             targets: boosterPack,
             y: centerY,
             duration: 800,
             ease: 'Bounce.easeOut',
             onComplete: () => {
-                // Make clickable
-                boosterPack.setInteractive();
-                boosterPack.on('pointerdown', () => {
-                    // Generate 3 random cards
-                    const cards = this.generateBoosterCards();
-
-                    // Remove booster pack
-                    boosterPack.destroy();
-
-                    // Show cards
-                    this.showCards(overlay, cards);
-                });
+                this.packOpeningState.phase = 'waiting_for_click';
             }
         });
+        this.packOpeningState.activeTweens.push(dropTween);
+    }
+
+    advancePackOpening() {
+        const state = this.packOpeningState;
+        if (!state) return;
+
+        const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+        const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
+
+        if (state.phase === 'dropping') {
+            // Skip drop animation, move pack to center immediately
+            state.activeTweens.forEach(tween => tween.stop());
+            state.activeTweens = [];
+            state.boosterPack.setPosition(centerX, centerY);
+            state.phase = 'waiting_for_click';
+
+        } else if (state.phase === 'waiting_for_click') {
+            // Open the pack
+            state.phase = 'opening';
+
+            // Generate 3 random cards
+            state.cards = this.generateBoosterCards();
+
+            // Create skull emoji texture for particles if it doesn't exist
+            if (!this.textures.exists('skull_emoji')) {
+                const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+                graphics.fillStyle(0xffffff, 1);
+                const skullText = this.add.text(0, 0, '💀', { fontSize: '32px' });
+                skullText.setOrigin(0.5);
+                const renderTexture = this.add.renderTexture(0, 0, 32, 32);
+                renderTexture.draw(skullText, 16, 16);
+                renderTexture.saveTexture('skull_emoji');
+                renderTexture.destroy();
+                skullText.destroy();
+                graphics.destroy();
+            }
+
+            // Create skull emoji particle emitter (BIGGER explosion!)
+            const skullEmitter = this.add.particles(centerX, centerY, 'skull_emoji', {
+                speed: { min: 150, max: 400 },
+                angle: { min: 0, max: 360 },
+                scale: { start: 2, end: 0 },
+                lifespan: 1200,
+                quantity: 30,
+                gravityY: 200
+            });
+            skullEmitter.setDepth(103);
+            skullEmitter.explode(30);
+            state.skullEmitter = skullEmitter;
+
+            // Pack expansion and disappear animation
+            const packTween = this.tweens.add({
+                targets: state.boosterPack,
+                scaleX: 0.7,
+                scaleY: 0.7,
+                alpha: 0,
+                duration: 300,
+                ease: 'Cubic.easeOut',
+                onComplete: () => {
+                    state.boosterPack.destroy();
+                }
+            });
+            state.activeTweens.push(packTween);
+
+            // Show cards after brief delay
+            const showCardsTimer = this.time.delayedCall(200, () => {
+                this.showCards(state.overlay, state.cards);
+            });
+            state.activeTimers.push(showCardsTimer);
+
+            // Clean up skull emitter after particles die
+            const cleanupTimer = this.time.delayedCall(1400, () => {
+                if (state.skullEmitter) {
+                    state.skullEmitter.destroy();
+                    state.skullEmitter = null;
+                }
+            });
+            state.activeTimers.push(cleanupTimer);
+
+        } else if (state.phase === 'opening') {
+            // Skip to showing cards
+            state.activeTweens.forEach(tween => tween.stop());
+            state.activeTimers.forEach(timer => timer.remove());
+            state.activeTweens = [];
+            state.activeTimers = [];
+
+            if (state.boosterPack) {
+                state.boosterPack.destroy();
+                state.boosterPack = null;
+            }
+            if (state.skullEmitter) {
+                state.skullEmitter.destroy();
+                state.skullEmitter = null;
+            }
+
+            this.showCards(state.overlay, state.cards);
+
+        } else if (state.phase === 'flipping') {
+            // Flip next card immediately
+            this.flipNextCardImmediately();
+
+        } else if (state.phase === 'done') {
+            // Close immediately
+            this.closePackOpening();
+        }
+    }
+
+    flipNextCardImmediately() {
+        const state = this.packOpeningState;
+        if (!state || !state.cardContainers) return;
+
+        // Stop all active tweens and timers
+        state.activeTweens.forEach(tween => tween.stop());
+        state.activeTimers.forEach(timer => timer.remove());
+        state.activeTweens = [];
+        state.activeTimers = [];
+
+        // If current card is mid-flip, complete it
+        if (state.currentCardIndex < state.cardContainers.length) {
+            const container = state.cardContainers[state.currentCardIndex];
+            const cardBack = container.getData('cardBack');
+            const cardFace = container.getData('cardFace');
+            const itemImage = container.getData('itemImage');
+
+            // Complete the flip instantly
+            container.setScale(1, 1);
+            cardBack.setVisible(false);
+            cardFace.setVisible(true);
+            itemImage.setVisible(true);
+
+            // Move to next card
+            state.currentCardIndex++;
+        }
+
+        // Start flipping the next card (or finish if done)
+        this.flipCardsSequentially(state.overlay, state.cardContainers, state.currentCardIndex);
+    }
+
+    closePackOpening() {
+        const state = this.packOpeningState;
+        if (!state) return;
+
+        // Stop all active animations
+        state.activeTweens.forEach(tween => tween.stop());
+        state.activeTimers.forEach(timer => timer.remove());
+
+        // Unlock the items
+        const unlockedItems = this.registry.get('unlockedItems') || [];
+        state.cardContainers.forEach(container => {
+            const item = container.getData('item');
+            if (!unlockedItems.includes(item)) {
+                unlockedItems.push(item);
+            }
+        });
+        this.registry.set('unlockedItems', unlockedItems);
+
+        // Cleanup and restart scene
+        state.cardContainers.forEach(container => container.destroy());
+        state.overlay.destroy();
+        if (state.boosterPack) state.boosterPack.destroy();
+        if (state.skullEmitter) state.skullEmitter.destroy();
+
+        this.packOpeningState = null;
+        this.enablePrayButton();
+        this.enableBackButton();
+        this.scene.restart();
     }
 
     generateBoosterCards() {
@@ -632,30 +891,36 @@ class Altar extends Phaser.Scene {
             cardContainers.push(container);
         });
 
+        // Update state
+        if (this.packOpeningState) {
+            this.packOpeningState.cardContainers = cardContainers;
+            this.packOpeningState.currentCardIndex = 0;
+            this.packOpeningState.phase = 'flipping';
+        }
+
         // Flip cards one at a time
         this.flipCardsSequentially(overlay, cardContainers, 0);
     }
 
     flipCardsSequentially(overlay, cardContainers, index) {
+        // Update current card index
+        if (this.packOpeningState) {
+            this.packOpeningState.currentCardIndex = index;
+        }
+
         if (index >= cardContainers.length) {
             // All cards flipped, wait then close
-            this.time.delayedCall(2000, () => {
-                // Unlock the items
-                const unlockedItems = this.registry.get('unlockedItems') || [];
-                cardContainers.forEach(container => {
-                    const item = container.getData('item');
-                    if (!unlockedItems.includes(item)) {
-                        unlockedItems.push(item);
-                    }
-                });
-                this.registry.set('unlockedItems', unlockedItems);
+            if (this.packOpeningState) {
+                this.packOpeningState.phase = 'done';
+            }
 
-                // Cleanup and restart scene
-                cardContainers.forEach(container => container.destroy());
-                overlay.destroy();
-                this.enablePrayButton();
-                this.scene.restart();
+            const closeTimer = this.time.delayedCall(2000, () => {
+                this.closePackOpening();
             });
+
+            if (this.packOpeningState) {
+                this.packOpeningState.activeTimers.push(closeTimer);
+            }
             return;
         }
 
@@ -664,8 +929,12 @@ class Altar extends Phaser.Scene {
         const cardFace = container.getData('cardFace');
         const itemImage = container.getData('itemImage');
 
+        // Get card world position
+        const cardX = container.x;
+        const cardY = container.y;
+
         // First half of flip: Shrink to middle (showing back)
-        this.tweens.add({
+        const shrinkTween = this.tweens.add({
             targets: container,
             scaleX: 0,
             duration: 250,
@@ -676,40 +945,91 @@ class Altar extends Phaser.Scene {
                 cardFace.setVisible(true);
                 itemImage.setVisible(true);
 
+                // Create particle burst at card flip moment
+                if (this.textures.exists('particle')) {
+                    const flipEmitter = this.add.particles(cardX, cardY, 'particle', {
+                        speed: { min: 50, max: 150 },
+                        angle: { min: 0, max: 360 },
+                        scale: { start: 0.5, end: 0 },
+                        lifespan: 600,
+                        quantity: 15,
+                        tint: [0xffffff, 0x4A90E2]
+                    });
+                    flipEmitter.setDepth(103);
+                    flipEmitter.explode(15);
+
+                    // Clean up emitter after particles die
+                    const cleanupTimer = this.time.delayedCall(700, () => {
+                        flipEmitter.destroy();
+                    });
+
+                    if (this.packOpeningState) {
+                        this.packOpeningState.activeTimers.push(cleanupTimer);
+                    }
+                }
+
                 // Second half of flip: Expand from middle (showing front)
-                this.tweens.add({
+                const expandTween = this.tweens.add({
                     targets: container,
                     scaleX: 1,
                     duration: 250,
                     ease: 'Cubic.easeOut',
                     onComplete: () => {
                         // Wait a bit, then flip next card
-                        this.time.delayedCall(500, () => {
+                        const nextCardTimer = this.time.delayedCall(500, () => {
                             this.flipCardsSequentially(overlay, cardContainers, index + 1);
                         });
+
+                        if (this.packOpeningState) {
+                            this.packOpeningState.activeTimers.push(nextCardTimer);
+                        }
                     }
                 });
+
+                if (this.packOpeningState) {
+                    this.packOpeningState.activeTweens.push(expandTween);
+                }
             }
         });
+
+        if (this.packOpeningState) {
+            this.packOpeningState.activeTweens.push(shrinkTween);
+        }
     }
 
     createBackButton() {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const buttonY = GAME_CONFIG.WORLD_HEIGHT - 68;
 
-        const button = this.add.graphics();
-        button.fillStyle(0x0B5563);  // Dark teal
-        button.fillRoundedRect(centerX - 60, buttonY - 20, 120, 40, 6);
-        button.lineStyle(3, 0x000000);
-        button.strokeRoundedRect(centerX - 60, buttonY - 20, 120, 40, 6);
-        button.setInteractive(new Phaser.Geom.Rectangle(centerX - 60, buttonY - 20, 120, 40), Phaser.Geom.Rectangle.Contains);
+        this.backButton = this.add.graphics();
+        this.backButton.fillStyle(0x0B5563);  // Dark teal
+        this.backButton.fillRoundedRect(centerX - 60, buttonY - 20, 120, 40, 6);
+        this.backButton.lineStyle(3, 0x000000);
+        this.backButton.strokeRoundedRect(centerX - 60, buttonY - 20, 120, 40, 6);
+        this.backButton.setInteractive(new Phaser.Geom.Rectangle(centerX - 60, buttonY - 20, 120, 40), Phaser.Geom.Rectangle.Contains);
 
-        const buttonText = this.add.text(centerX, buttonY, 'BACK', {
+        this.backButtonText = this.add.text(centerX, buttonY, 'BACK', {
             fontFamily: 'Arial Black',
             fontSize: 20,
             color: '#000000'
         }).setOrigin(0.5);
 
-        button.on('pointerdown', () => this.scene.start('MainMenu'));
+        this.backButton.on('pointerdown', () => this.scene.start('MainMenu'));
+
+        this.isBackButtonEnabled = true;
+    }
+
+    disableBackButton() {
+        this.isBackButtonEnabled = false;
+        this.backButton.disableInteractive();
+        this.backButtonText.setAlpha(0.5);
+    }
+
+    enableBackButton() {
+        this.isBackButtonEnabled = true;
+        const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+        const buttonY = GAME_CONFIG.WORLD_HEIGHT - 68;
+        this.backButton.setInteractive(new Phaser.Geom.Rectangle(centerX - 60, buttonY - 20, 120, 40), Phaser.Geom.Rectangle.Contains);
+        this.backButtonText.setAlpha(1);
     }
 }

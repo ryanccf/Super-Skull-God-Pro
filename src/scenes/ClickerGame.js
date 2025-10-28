@@ -532,7 +532,7 @@ class ClickerGame extends Phaser.Scene {
 
             // Create Matter body - rectangle (board) that rotates with sprite!
             this.matter.add.gameObject(triangle, {
-                shape: { type: 'rectangle', width: 120, height: 60 },
+                shape: { type: 'rectangle', width: 120, height: 30 },
                 isStatic: true,
                 label: 'triangle'
             });

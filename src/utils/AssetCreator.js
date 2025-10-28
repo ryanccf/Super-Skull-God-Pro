@@ -187,13 +187,13 @@ class AssetCreator {
     static createTriangle(scene) {
         const triangleCanvas = scene.add.graphics();
 
-        // Board - 120px width, 60px height (half of square)
+        // Board - 120px width, 30px height (half as tall)
         const width = 120;
-        const height = 60;
+        const height = 30;
 
         // Center the rectangle
         const centerX = 60;
-        const centerY = 30;
+        const centerY = 15;
 
         triangleCanvas.fillStyle(0xFF8C42);  // Orange
         triangleCanvas.fillRect(centerX - width/2, centerY - height/2, width, height);
@@ -201,7 +201,7 @@ class AssetCreator {
         triangleCanvas.lineStyle(6, 0x000000);  // Black border, thicker
         triangleCanvas.strokeRect(centerX - width/2, centerY - height/2, width, height);
 
-        triangleCanvas.generateTexture('triangle', 120, 60);
+        triangleCanvas.generateTexture('triangle', 120, 30);
         triangleCanvas.destroy();
     }
 
