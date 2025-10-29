@@ -10,7 +10,7 @@ class ShopRefactored extends Phaser.Scene {
     create() {
         // Setup background
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
-        const bg = this.add.image(centerX, GAME_CONFIG.WORLD_HEIGHT / 2, 'shop_background');
+        const bg = this.add.image(centerX, GAME_CONFIG.WORLD_HEIGHT / 2, 'game_background');
         bg.setOrigin(0.5, 0.5); // Explicitly center the background
         // Scale to cover the entire screen
         const scaleX = GAME_CONFIG.WORLD_WIDTH / bg.width;
