@@ -29,10 +29,17 @@ echo ========================================
 echo  Preparation Complete!
 echo ========================================
 echo.
-echo You can now build the APK:
-echo   cd android
-echo   gradlew.bat clean
-echo   gradlew.bat assembleDebug
+echo Building the APK...
+cd android
+call gradlew.bat clean
+call gradlew.bat assembleDebug
+cd ..
+
+echo.
+echo ========================================
+echo  Build Complete!
+echo ========================================
+dir android\app\build\outputs\apk\debug\*.apk
 echo.
 echo Or for release build:
 echo   gradlew.bat assembleRelease

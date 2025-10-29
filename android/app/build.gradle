@@ -15,7 +15,19 @@ android {
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        noCompress 'png', 'jpg', 'jpeg'
     }
+
+    aaptOptions {
+        noCompress 'png', 'jpg', 'jpeg'
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

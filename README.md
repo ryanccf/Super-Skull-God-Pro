@@ -91,15 +91,30 @@ The release APK will be located at:
 
 ### Full Build Process
 
+**Option 1: Use the automated build script (Recommended)**
+```cmd
+# From project root - this does everything automatically
+build-android.bat
+```
+
+The script will:
+1. Increment version numbers
+2. Copy files to www/
+3. Sync to Android
+4. Build the debug APK
+5. Show you the APK location and size
+
+**Option 2: Manual build**
 ```cmd
 # From project root
-
-# 1. Copy latest code to www and sync to Android
-build-android.bat
-
-# 2. Build the APK
 cd android
 gradlew.bat clean
+gradlew.bat assembleDebug
+```
+
+For release builds:
+```cmd
+cd android
 gradlew.bat assembleRelease
 ```
 
@@ -179,6 +194,28 @@ Check that your latest code is in the Android assets:
 ls android/app/src/main/assets/public/src/scenes/
 ```
 You should see your latest scene files (e.g., ShopRefactored.js, Altar.js).
+
+#### APK is only 4MB but should be 60-90MB
+
+If your APK is much smaller than expected:
+
+**Expected size:** With 119MB of PNG assets, your APK should be **60-90MB** (PNG files are pre-compressed so they don't shrink much in the APK).
+
+**Fixes applied in build.gradle:**
+- Added `noCompress` directives for PNG/JPG files to prevent double-compression issues
+- Added explicit `sourceSets` configuration to ensure Gradle finds the assets
+- These settings ensure all 119MB of assets are included in the APK
+
+**Verify your build:**
+1. Run the build script: `build-android.bat`
+2. Check the output - it will show the APK size
+3. The debug APK should be in `android\app\build\outputs\apk\debug\`
+4. File should be 60MB+ in size
+
+**If still small:**
+- Make sure you ran `build-android.bat` (not manual gradle commands)
+- Check the build output for errors about "assets" or "packaging"
+- Verify assets exist: `dir android\app\src\main\assets\public\src\assets\images\`
 
 ## Game Features
 
