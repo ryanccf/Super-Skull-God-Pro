@@ -119,8 +119,10 @@ class Skull {
             verticalForce / 60
         );
 
-        // Add +1 to skull value
-        this.value += 1;
+        // Add +1 plus bonus from cards to skull value
+        const baseAddition = 1;
+        const cardBonus = this.scene.registry.get('cardBonusFlipperAddition') || 0;
+        this.value += baseAddition + cardBonus;
         if (this.valueText) {
             this.valueText.setText(this.value.toString());
         }
@@ -130,18 +132,21 @@ class Skull {
     }
 
     applyBumperMultiplier() {
-        // Diminishing returns formula:
-        // 1st hit: +100% (×2), 2nd: +50% (×1.5), 3rd: +25% (×1.25), 4th: +12.5% (×1.125), etc.
-        // multiplierBonus = 1.0 / (2^bumperHitCount)
-        const multiplierBonus = 1.0 / Math.pow(2, this.bumperHitCount);
-        const totalMultiplier = 1 + multiplierBonus;
+        // Get max multiplier from registry (base 4, increased by card upgrades)
+        const maxMultiplier = this.scene.registry.get('bumperMaxMultiplier') || 4;
 
-        this.value = Math.floor(this.value * totalMultiplier);
-        this.sprite.setTint(COLORS.LIGHT_YELLOW);
-        if (this.valueText) {
-            this.valueText.setText(this.value.toString());
-            this.valueText.setColor('#ffffff');
+        // Apply multiplier only if under the max count
+        // Hit count 0-3 gets multiplier with max 4, etc.
+        if (this.bumperHitCount < maxMultiplier) {
+            // Simple 2x multiplier per bounce, up to the max
+            this.value = Math.floor(this.value * 2);
+            this.sprite.setTint(COLORS.LIGHT_YELLOW);
+            if (this.valueText) {
+                this.valueText.setText(this.value.toString());
+                this.valueText.setColor('#ffffff');
+            }
         }
+        // If at or above max, no multiplier applied
     }
 
     destroy() {

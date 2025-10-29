@@ -18,8 +18,8 @@ class TriangleManipulator {
         this.outline.setVisible(false);
 
         // Rotation handle - draggable circle at edge of triangle
-        this.rotationHandle = this.scene.add.circle(0, 0, 12, 0x00FF00, 0.8);
-        this.rotationHandle.setStrokeStyle(2, 0xFFFFFF);
+        this.rotationHandle = this.scene.add.circle(0, 0, 36, 0x00FF00, 0.8);
+        this.rotationHandle.setStrokeStyle(4, 0xFFFFFF);
         this.rotationHandle.setDepth(101);
         this.rotationHandle.setVisible(false);
         this.rotationHandle.setInteractive({ draggable: true });
@@ -130,11 +130,11 @@ class TriangleManipulator {
 
         // Draw rotation icon (circular arrow) - rotated with triangle
         this.rotationIcon.clear();
-        this.rotationIcon.lineStyle(2, 0xFFFFFF, 1);
+        this.rotationIcon.lineStyle(4, 0xFFFFFF, 1);
 
         const iconX = this.rotationHandle.x;
         const iconY = this.rotationHandle.y;
-        const radius = 6;
+        const radius = 18;
         const triangleRot = this.triangle.rotation;
 
         // Draw arc (270 degrees) - relative to triangle rotation
@@ -153,7 +153,7 @@ class TriangleManipulator {
         const arrowAngle = Phaser.Math.DegToRad(225) + triangleRot;
         const arrowX = iconX + Math.cos(arrowAngle) * radius;
         const arrowY = iconY + Math.sin(arrowAngle) * radius;
-        const arrowSize = 3;
+        const arrowSize = 9;
 
         this.rotationIcon.fillStyle(0xFFFFFF, 1);
         this.rotationIcon.beginPath();

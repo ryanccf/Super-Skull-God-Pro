@@ -483,7 +483,7 @@ class Altar extends Phaser.Scene {
         const characterSize = 220;
         const padding = 70;
         const characterSpacing = 240;
-        const characterY = 300; // Position below flavor text (which ends around y: 190)
+        const characterY = 360; // Position below flavor text (which ends around y: 190)
 
         // Check if Skull Knight is unlocked (all 12 items)
         const knightUnlocked = CHARACTER_UNLOCKABLES['Skull Knight'].every(item =>
@@ -801,12 +801,15 @@ class Altar extends Phaser.Scene {
         state.activeTweens.forEach(tween => tween.stop());
         state.activeTimers.forEach(timer => timer.remove());
 
-        // Unlock the items
+        // Unlock the items and apply bonuses
         const unlockedItems = this.registry.get('unlockedItems') || [];
         state.cardContainers.forEach(container => {
             const item = container.getData('item');
             if (!unlockedItems.includes(item)) {
                 unlockedItems.push(item);
+
+                // Apply card upgrade bonus
+                this.applyCardBonus(item);
             }
         });
         this.registry.set('unlockedItems', unlockedItems);
@@ -1031,5 +1034,33 @@ class Altar extends Phaser.Scene {
         const buttonY = GAME_CONFIG.WORLD_HEIGHT - 68;
         this.backButton.setInteractive(new Phaser.Geom.Rectangle(centerX - 60, buttonY - 20, 120, 40), Phaser.Geom.Rectangle.Contains);
         this.backButtonText.setAlpha(1);
+    }
+
+    applyCardBonus(itemName) {
+        // Check if this card grants an upgrade
+        const upgradeType = CARD_UPGRADES[itemName];
+        if (!upgradeType) return;
+
+        switch (upgradeType) {
+            case 'bumperMultiplier':
+                const currentMultiplier = this.registry.get('bumperMaxMultiplier') || 4;
+                this.registry.set('bumperMaxMultiplier', currentMultiplier + 1);
+                break;
+
+            case 'gameTime':
+                const currentBonus = this.registry.get('cardBonusGameTime') || 0;
+                this.registry.set('cardBonusGameTime', currentBonus + 1);
+                break;
+
+            case 'maxSkulls':
+                const currentMaxBonus = this.registry.get('cardBonusMaxSkulls') || 0;
+                this.registry.set('cardBonusMaxSkulls', currentMaxBonus + 1);
+                break;
+
+            case 'flipperAddition':
+                const currentFlipperBonus = this.registry.get('cardBonusFlipperAddition') || 0;
+                this.registry.set('cardBonusFlipperAddition', currentFlipperBonus + 1);
+                break;
+        }
     }
 }

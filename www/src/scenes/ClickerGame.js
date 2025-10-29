@@ -11,8 +11,17 @@ class ClickerGame extends Phaser.Scene {
     initializeGameState() {
         this.roundScore = 0;
         this.totalSkulls = this.registry.get('totalSkulls');
-        this.maxSkulls = this.registry.get('maxSkulls');
-        this.gameTime = this.registry.get('gameTime');
+
+        // Max skulls: base value + card bonuses
+        const baseMaxSkulls = this.registry.get('maxSkulls');
+        const cardBonusMaxSkulls = this.registry.get('cardBonusMaxSkulls') || 0;
+        this.maxSkulls = baseMaxSkulls + cardBonusMaxSkulls;
+
+        // Game time: base value + card bonuses
+        const baseGameTime = this.registry.get('gameTime');
+        const cardBonusGameTime = this.registry.get('cardBonusGameTime') || 0;
+        this.gameTime = baseGameTime + cardBonusGameTime;
+
         this.bigSkullSpawned = false;
         this.isGameOver = false;
     }
@@ -209,9 +218,8 @@ class ClickerGame extends Phaser.Scene {
             this.createAutoStartUI();
         }
 
-        // Fast Forward button (only show if Skeleton Warrior is unlocked)
-        const unlockedItems = this.registry.get('unlockedItems');
-        if (unlockedItems.includes('Skeleton Warrior')) {
+        // Fast Forward button (only show if Skull Knight is unlocked)
+        if (SaveDataService.isCharacterUnlocked(this.registry, 'Skull Knight')) {
             this.createFastForwardButton();
         }
     }
@@ -1405,9 +1413,10 @@ class ClickerGame extends Phaser.Scene {
             this.tweens.getTweensOf(skullObj.sprite).forEach(tween => tween.remove());
         }
 
-        // Calculate new scale (reduce by 10%, minimum 10% of original)
+        // Calculate new scale (reduce by 10%, or 20% if Shamaness unlocked, minimum 10% of original)
         const currentScale = skullObj.sprite.scaleX;
-        const newScale = Math.max(0.1, currentScale * 0.9);
+        const shrinkMultiplier = SaveDataService.isCharacterUnlocked(this.registry, 'Skull Shamaness') ? 0.8 : 0.9;
+        const newScale = Math.max(0.1, currentScale * shrinkMultiplier);
 
         // Apply shrinking
         skullObj.sprite.setScale(newScale);

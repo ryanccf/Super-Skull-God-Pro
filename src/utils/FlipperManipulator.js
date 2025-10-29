@@ -19,8 +19,8 @@ class FlipperManipulator {
         this.outline.setVisible(false);
 
         // Rotation handle - draggable circle at edge of flipper
-        this.rotationHandle = this.scene.add.circle(0, 0, 12, 0x00FF00, 0.8);
-        this.rotationHandle.setStrokeStyle(2, 0xFFFFFF);
+        this.rotationHandle = this.scene.add.circle(0, 0, 36, 0x00FF00, 0.8);
+        this.rotationHandle.setStrokeStyle(4, 0xFFFFFF);
         this.rotationHandle.setDepth(101);
         this.rotationHandle.setVisible(false);
         this.rotationHandle.setInteractive({ draggable: true });
@@ -31,8 +31,8 @@ class FlipperManipulator {
         this.rotationIcon.setVisible(false);
 
         // Flip button - icon to mirror the flipper
-        this.flipButton = this.scene.add.circle(0, 0, 12, 0x0088FF, 0.8);
-        this.flipButton.setStrokeStyle(2, 0xFFFFFF);
+        this.flipButton = this.scene.add.circle(0, 0, 36, 0x0088FF, 0.8);
+        this.flipButton.setStrokeStyle(4, 0xFFFFFF);
         this.flipButton.setDepth(101);
         this.flipButton.setVisible(false);
         this.flipButton.setInteractive();
@@ -188,11 +188,11 @@ class FlipperManipulator {
 
         // Draw rotation icon (circular arrow) - rotated with flipper
         this.rotationIcon.clear();
-        this.rotationIcon.lineStyle(2, 0xFFFFFF, 1);
+        this.rotationIcon.lineStyle(4, 0xFFFFFF, 1);
 
         const iconX = this.rotationHandle.x;
         const iconY = this.rotationHandle.y;
-        const radius = 6;
+        const radius = 18;
         const flipperRot = this.flipper.rotation;
         // baseScaleX and isFlipped already declared above
         const rotationDirection = isFlipped ? -1 : 1;
@@ -227,7 +227,7 @@ class FlipperManipulator {
             : Phaser.Math.DegToRad(225) + flipperRot;
         const arrowX = iconX + Math.cos(arrowAngle) * radius;
         const arrowY = iconY + Math.sin(arrowAngle) * radius;
-        const arrowSize = 3;
+        const arrowSize = 9;
 
         this.rotationIcon.fillStyle(0xFFFFFF, 1);
         this.rotationIcon.beginPath();
@@ -256,13 +256,13 @@ class FlipperManipulator {
 
         // Draw flip icon (horizontal double arrow) - rotated with flipper
         this.flipIcon.clear();
-        this.flipIcon.lineStyle(2, 0xFFFFFF, 1);
+        this.flipIcon.lineStyle(4, 0xFFFFFF, 1);
         this.flipIcon.fillStyle(0xFFFFFF, 1);
 
         const flipX = this.flipButton.x;
         const flipY = this.flipButton.y;
-        const arrowWidth = 8;
-        const arrowHeight = 3;
+        const arrowWidth = 24;
+        const arrowHeight = 9;
 
         // Helper function to rotate a point around the flip button center
         // When flipped, mirror the rotation

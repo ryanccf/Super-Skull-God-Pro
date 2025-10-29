@@ -9,7 +9,10 @@ class Boot extends Phaser.Scene {
                 this.registry.set(key, DEFAULT_SAVE_DATA[key]);
             }
         });
-        
+
+        // Recalculate card bonuses based on unlocked items
+        SaveDataService.recalculateCardBonuses(this.registry);
+
         this.scene.start('Preloader');
     }
 }

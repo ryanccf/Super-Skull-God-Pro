@@ -53,39 +53,78 @@ const ALL_UNLOCKABLES = [
 // For backwards compatibility
 const UNLOCKABLES = ALL_UNLOCKABLES;
 
-// Card text descriptions
-const CARD_TEXT = {
-    // Skull Knight cards
-    'Skull Helm': 'A Skull for a Skull.',
-    'Skull Dagger': 'Stabby Skull goes poke poke poke!',
-    'Skull Gauntlets': '"What if the Gauntlets had Skulls on them?"',
-    'Skull Breastplate': 'Block it with a Skull. Now that\s using your Skull.',
-    'Skull Skirt': 'Super Macho Skull-Themed Battle Skirt.',
-    'Skull Boots': 'Skull Booties! Adorable.',
-    'Skull Shoulderpads': '"You could fit more Skulls on there."',
-    'Skull Shield': 'When you\'re hard-headed, you block everything with your Skull.',
-    'Skull Belt': 'How else do you expect to hold up your skull pants?',
-    'Skull Bow': 'Skeleton Archers ruined Dark Souls. Why not this game, too?',
-    'Skull Quiver': 'Skull Quiver? I never even met \'er.',
-    'Skull Sword': 'Deadly Weapon? Fearsome Fashion Accessory? Why not both?',
+// Card upgrade types (24 cards: 6 of each type)
+const CARD_UPGRADES = {
+    // Bumper Max Multiplier (6 cards)
+    'Skull Helm': 'bumperMultiplier',
+    'Skull Gauntlets': 'bumperMultiplier',
+    'Skull Shoulderpads': 'bumperMultiplier',
+    'Skull Belt': 'bumperMultiplier',
+    'Skull Headdress': 'bumperMultiplier',
+    'Skull Necklace': 'bumperMultiplier',
 
-    // Skull Shamaness cards (placeholder text)
-    'Skull Headdress': 'The ancient headdress imbued with mystical power and dark wisdom by The Ancestors.',
-    'Skull Dress': 'All my Skull Baddies make it Clank Clank Clank!',
-    'Skull Potion': 'You should have a sip. Just a little one. Go ahead. Here.',
-    'Skull Staff': 'A staff imbued with Big Skull Energy',
-    'Skull Scimitar': 'More like Skullmitar.',
-    'Skull Necklace': 'Dat Skull drip.',
-    'Skull Bodice': 'Layers of Skulls.',
-    'Skull Bra': 'Extremely comfortable.',
-    'Skull Bikini': 'You can\'t really consider yourself Goth if this isn\'t your daily driver underwear.',
-    'Skull Midriff Belt': 'For when you want to accentuate your Skellybutton.',
-    'Skull Bracer': 'It needs more skulls.',
-    'Skull Lipstick': 'It\'s actually just Skull-Flavored Lip Gloss.',
+    // Game Time (6 cards)
+    'Skull Dagger': 'gameTime',
+    'Skull Boots': 'gameTime',
+    'Skull Quiver': 'gameTime',
+    'Skull Dress': 'gameTime',
+    'Skull Bodice': 'gameTime',
+    'Skull Bracer': 'gameTime',
+
+    // Flipper Addition (6 cards)
+    'Skull Breastplate': 'flipperAddition',
+    'Skull Shield': 'flipperAddition',
+    'Skull Bow': 'flipperAddition',
+    'Skull Potion': 'flipperAddition',
+    'Skull Scimitar': 'flipperAddition',
+    'Skull Lipstick': 'flipperAddition',
+
+    // Max Skulls (6 cards)
+    'Skull Skirt': 'maxSkulls',
+    'Skull Sword': 'maxSkulls',
+    'Skull Staff': 'maxSkulls',
+    'Skull Bra': 'maxSkulls',
+    'Skull Bikini': 'maxSkulls',
+    'Skull Midriff Belt': 'maxSkulls'
+};
+
+// Card text descriptions with upgrade info
+const CARD_TEXT = {
+    // Bumper Max Multiplier cards
+    'Skull Helm': 'A Skull for a Skull.\n+1 Bumper Max Multiplier',
+    'Skull Gauntlets': '"What if the Gauntlets had Skulls on them?"\n+1 Bumper Max Multiplier',
+    'Skull Shoulderpads': '"You could fit more Skulls on there."\n+1 Bumper Max Multiplier',
+    'Skull Belt': 'How else do you expect to hold up your skull pants?\n+1 Bumper Max Multiplier',
+    'Skull Headdress': 'The ancient headdress imbued with mystical power.\n+1 Bumper Max Multiplier',
+    'Skull Necklace': 'Dat Skull drip.\n+1 Bumper Max Multiplier',
+
+    // Game Time cards
+    'Skull Dagger': 'Stabby Skull goes poke poke poke!\n+1 Game Time',
+    'Skull Boots': 'Skull Booties! Adorable.\n+1 Game Time',
+    'Skull Quiver': 'Skull Quiver? I never even met \'er.\n+1 Game Time',
+    'Skull Dress': 'All my Skull Baddies make it Clank Clank Clank!\n+1 Game Time',
+    'Skull Bodice': 'Layers of Skulls.\n+1 Game Time',
+    'Skull Bracer': 'It needs more skulls.\n+1 Game Time',
+
+    // Flipper Addition cards
+    'Skull Breastplate': 'Block it with a Skull. Now that\'s using your Skull.\n+1 Flipper Addition',
+    'Skull Shield': 'When you\'re hard-headed, you block everything with your Skull.\n+1 Flipper Addition',
+    'Skull Bow': 'Skeleton Archers ruined Dark Souls. Why not this game, too?\n+1 Flipper Addition',
+    'Skull Potion': 'You should have a sip. Just a little one. Go ahead. Here.\n+1 Flipper Addition',
+    'Skull Scimitar': 'More like Skullmitar.\n+1 Flipper Addition',
+    'Skull Lipstick': 'It\'s actually just Skull-Flavored Lip Gloss.\n+1 Flipper Addition',
+
+    // Max Skulls cards
+    'Skull Skirt': 'Super Macho Skull-Themed Battle Skirt.\n+1 Max Skulls',
+    'Skull Sword': 'Deadly Weapon? Fearsome Fashion Accessory? Why not both?\n+1 Max Skulls',
+    'Skull Staff': 'A staff imbued with Big Skull Energy.\n+1 Max Skulls',
+    'Skull Bra': 'Extremely comfortable.\n+1 Max Skulls',
+    'Skull Bikini': 'You can\'t really consider yourself Goth if this isn\'t your daily driver underwear.\n+1 Max Skulls',
+    'Skull Midriff Belt': 'For when you want to accentuate your Skellybutton.\n+1 Max Skulls',
 
     // Character cards
     'Skull Knight': 'The legendary Skull Knight. A warrior who has conquered death itself. Unlocks 2X Fast Forward speed.',
-    'Skull Shamaness': 'The mystical Skull Shamaness. A sorceress who commands the forces of life and death. Unlocks powerful abilities.'
+    'Skull Shamaness': 'The mystical Skull Shamaness. A sorceress who commands the forces of life and death. Doubles head shrink rate (20% per shrink).'
 };
 
 const DEFAULT_SAVE_DATA = {
@@ -119,5 +158,10 @@ const DEFAULT_SAVE_DATA = {
     autoStartRemainingTime: 0,
     prestigeLevel: 0,
     prestigeMultiplier: 1,
-    fastForwardEnabled: false
+    fastForwardEnabled: false,
+    // Card upgrade bonuses
+    bumperMaxMultiplier: 4,  // Base max multiplier for bumpers
+    cardBonusGameTime: 0,    // Bonus time from cards
+    cardBonusMaxSkulls: 0,   // Bonus max skulls from cards
+    cardBonusFlipperAddition: 0  // Bonus value added by flippers from cards
 };

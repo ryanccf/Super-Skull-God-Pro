@@ -187,4 +187,44 @@ class SaveDataService {
     static setPrestigeMultiplier(registry, value) {
         registry.set('prestigeMultiplier', value);
     }
+
+    // ===== Card Upgrade Bonuses =====
+
+    static recalculateCardBonuses(registry) {
+        // Reset bonuses
+        let bumperMaxMultiplier = 4;  // Base value
+        let cardBonusGameTime = 0;
+        let cardBonusMaxSkulls = 0;
+        let cardBonusFlipperAddition = 0;
+
+        // Get unlocked items
+        const unlockedItems = this.getUnlockedItems(registry);
+
+        // Count bonuses from each unlocked card
+        unlockedItems.forEach(itemName => {
+            const upgradeType = CARD_UPGRADES[itemName];
+            if (!upgradeType) return;
+
+            switch (upgradeType) {
+                case 'bumperMultiplier':
+                    bumperMaxMultiplier++;
+                    break;
+                case 'gameTime':
+                    cardBonusGameTime++;
+                    break;
+                case 'maxSkulls':
+                    cardBonusMaxSkulls++;
+                    break;
+                case 'flipperAddition':
+                    cardBonusFlipperAddition++;
+                    break;
+            }
+        });
+
+        // Apply to registry
+        registry.set('bumperMaxMultiplier', bumperMaxMultiplier);
+        registry.set('cardBonusGameTime', cardBonusGameTime);
+        registry.set('cardBonusMaxSkulls', cardBonusMaxSkulls);
+        registry.set('cardBonusFlipperAddition', cardBonusFlipperAddition);
+    }
 }
