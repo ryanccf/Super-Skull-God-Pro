@@ -32,16 +32,30 @@ python3 -m http.server 8000
 - Android Studio (for SDK)
 - Java Development Kit (JDK)
 
-### Sync Web Assets to Android
+### Prepare and Sync Web Assets to Android
 
-**IMPORTANT:** Before building, you MUST sync your web code changes to the Android project:
+**IMPORTANT:** Before building, you MUST copy your latest code to `www/` and sync to Android:
 
-```bash
-# From project root (not the android folder!)
+**Option 1: Use the build script (Recommended)**
+```cmd
+# From project root - this copies files to www/ and syncs to Android
+build-android.bat
+```
+
+**Option 2: Manual steps**
+```cmd
+# 1. Copy your current code to www directory
+copy /Y index.html www\index.html
+xcopy /E /I /Y src www\src
+
+# 2. Sync to Android project
 npx cap sync android
 ```
 
-This copies your web files (HTML, CSS, JS, assets) from `src/` into the Android project. Without this step, your APK will contain old code!
+This is necessary because:
+- Your working files are in the root `src/` folder
+- Capacitor syncs from the `www/` directory
+- Without copying first, your APK will contain old code!
 
 ### Build APK on Windows
 
@@ -79,7 +93,11 @@ The release APK will be located at:
 
 ```cmd
 # From project root
-npx cap sync android
+
+# 1. Copy latest code to www and sync to Android
+build-android.bat
+
+# 2. Build the APK
 cd android
 gradlew.bat clean
 gradlew.bat assembleRelease
