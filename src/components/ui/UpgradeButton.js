@@ -61,16 +61,35 @@ class UpgradeButton extends Phaser.GameObjects.Container {
 
     updateDisplay() {
         // Determine button state
-        const canPurchase = UpgradeService.canPurchaseUpgrade(this.registry, this.config);
-        const multiplier = this.config.multiplier || 1.6;
-        const cost = UpgradeService.calculateCost(this.config.basePrice, this.config.level, multiplier);
+        const canPurchase = UpgradeService.canPurchaseUpgrade(this.registry, this.config, this.upgradeType);
+
+        // Special cost calculation for auto-start
+        let cost;
+        if (this.upgradeType === 'autoStart') {
+            const unlocked = SaveDataService.getAutoStartUnlocked(this.registry);
+            cost = unlocked ? 200 : 100;
+        } else {
+            const multiplier = this.config.multiplier || 1.6;
+            cost = UpgradeService.calculateCost(this.config.basePrice, this.config.level, multiplier);
+        }
+
         const isMaxLevel = this.config.maxLevel && this.config.level >= this.config.maxLevel;
         const needsPlacement = this.config.needsPlacement &&
                               this.config.canPurchase &&
                               !this.config.canPurchase(this.registry);
 
         // Update title text - show "Buy [Name] #[number]" or just upgrade name
-        if (this.config.needsPlacement && !isMaxLevel) {
+        if (this.upgradeType === 'autoStart') {
+            const unlocked = SaveDataService.getAutoStartUnlocked(this.registry);
+            if (!unlocked) {
+                this.titleText.setText('Unlock Auto-Start');
+            } else if (isMaxLevel) {
+                this.titleText.setText('Auto-Start (MAX)');
+            } else {
+                const delay = Math.max(1, 10 - this.config.level);
+                this.titleText.setText(`Auto-Start -1s`);
+            }
+        } else if (this.config.needsPlacement && !isMaxLevel) {
             const nextNumber = this.config.level + 1;
             this.titleText.setText(`Buy ${this.config.name} #${nextNumber}`);
         } else if (isMaxLevel) {

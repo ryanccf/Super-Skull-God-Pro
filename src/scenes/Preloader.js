@@ -54,6 +54,7 @@ class Preloader extends Phaser.Scene {
         this.load.image('game_background', 'src/assets/images/backgrounds/game_background.png');
         this.load.image('game_over_background', 'src/assets/images/backgrounds/game_over_background.png');
         this.load.image('altar_background', 'src/assets/images/backgrounds/altar_background.png');
+        this.load.image('shop_background', 'src/assets/images/backgrounds/shop_background.png');
 
         // Load unlockables for both characters
         CHARACTER_UNLOCKABLES['Skull Knight'].forEach(name => {

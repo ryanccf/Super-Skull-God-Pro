@@ -33,12 +33,20 @@ class GameOver extends Phaser.Scene {
             "Click to Continue"
         ].join('\n');
 
+        // Create white background box for text
+        const boxWidth = 500;
+        const boxHeight = 280;
+        const box = this.add.graphics();
+        box.fillStyle(0xffffff, 0.95);
+        box.fillRoundedRect(centerX - boxWidth/2, 384 - boxHeight/2, boxWidth, boxHeight, 12);
+        box.lineStyle(4, 0x000000);
+        box.strokeRoundedRect(centerX - boxWidth/2, 384 - boxHeight/2, boxWidth, boxHeight, 12);
+
+        // Add text without stroke
         this.add.text(centerX, 384, message, {
             fontFamily: 'Arial Black',
             fontSize: 36,
-            color: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 8,
+            color: '#000000',
             align: 'center'
         }).setOrigin(0.5);
 

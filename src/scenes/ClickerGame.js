@@ -192,20 +192,17 @@ class ClickerGame extends Phaser.Scene {
             color: '#000000'
         };
 
-        // White backdrop for score display
+        // White backdrop for score display (increased height to fit all labels)
         const scoreBackdrop = this.add.graphics();
         scoreBackdrop.fillStyle(0xffffff, 0.9);
-        scoreBackdrop.fillRoundedRect(sidebarX - 10, 25, 280, 220, 12);
+        scoreBackdrop.fillRoundedRect(sidebarX - 10, 25, 280, 250, 12);
         scoreBackdrop.setDepth(0);
 
-        this.roundScoreText = this.add.text(sidebarX, 100, `Round: ${this.roundScore}`, textStyle).setDepth(1);
-        this.totalSkullsText = this.add.text(sidebarX, 160, `Total: ${this.totalSkulls}`, textStyle).setDepth(1);
-        this.maxSkullsText = this.add.text(sidebarX, 220, `Max: ${this.maxSkulls}`, {
-            fontFamily: 'Arial Black',
-            fontSize: 28,
-            color: '#000000'
-        }).setDepth(1);
+        const highscore = this.registry.get('highscore') || 0;
         this.timeText = this.add.text(sidebarX, 40, `Time: ${this.gameTime}`, textStyle).setDepth(1);
+        this.roundScoreText = this.add.text(sidebarX, 85, `Round: ${this.roundScore}`, textStyle).setDepth(1);
+        this.highscoreText = this.add.text(sidebarX, 130, `Highest: ${highscore}`, textStyle).setDepth(1);
+        this.totalSkullsText = this.add.text(sidebarX, 175, `Total: ${this.totalSkulls}`, textStyle).setDepth(1);
 
         // Auto-start UI (only show if unlocked)
         if (this.registry.get('autoStartUnlocked')) {
@@ -1566,7 +1563,13 @@ class ClickerGame extends Phaser.Scene {
     updateScoreDisplay() {
         this.roundScoreText.setText(`Round: ${this.roundScore}`);
         this.totalSkullsText.setText(`Total: ${this.totalSkulls}`);
-        
+
+        // Update highest score display if current round exceeds it
+        const currentHighscore = this.registry.get('highscore') || 0;
+        if (this.roundScore > currentHighscore) {
+            this.highscoreText.setText(`Highest: ${this.roundScore}`);
+        }
+
         this.tweens.add({
             targets: [this.roundScoreText, this.totalSkullsText],
             scaleX: 1.2,
@@ -1797,8 +1800,31 @@ class ClickerGame extends Phaser.Scene {
 
         // Save high score first
         const currentBest = this.registry.get('highscore');
-        if (this.roundScore > currentBest) {
+        const isNewHighScore = this.roundScore > currentBest;
+        if (isNewHighScore) {
             this.registry.set('highscore', this.roundScore);
+
+            // Show "New High Score!" alert in big yellow letters
+            const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+            const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
+            const highScoreText = this.add.text(centerX, centerY - 100, 'New High Score!', {
+                fontFamily: 'Arial Black',
+                fontSize: 72,
+                color: '#FFD700',
+                stroke: '#000000',
+                strokeThickness: 8
+            }).setOrigin(0.5).setDepth(1000);
+
+            // Fade out slowly over 3 seconds
+            this.tweens.add({
+                targets: highScoreText,
+                alpha: 0,
+                duration: 3000,
+                ease: 'Power2',
+                onComplete: () => {
+                    highScoreText.destroy();
+                }
+            });
         }
 
         // Reset auto-start timer for the next cycle

@@ -328,14 +328,28 @@ class UpgradeService {
                 registryKey: 'autoStart',
                 level: SaveDataService.getAutoStartLevel(registry),
                 maxLevel: 9,
-                unlockRequirement: () => SaveDataService.getAutoStartUnlocked(registry),
-                description: 'Reduce auto-start delay',
+                description: 'Auto-restart rounds',
                 getValue: (level) => {
+                    const unlocked = SaveDataService.getAutoStartUnlocked(registry);
+                    if (!unlocked) return '';
                     const delay = Math.max(1, 10 - level);
                     return `${delay}s delay`;
                 },
+                canPurchase: (registry) => {
+                    const unlocked = SaveDataService.getAutoStartUnlocked(registry);
+                    const level = SaveDataService.getAutoStartLevel(registry);
+                    return !unlocked || level < 9;
+                },
                 onPurchase: (registry, level) => {
-                    SaveDataService.setAutoStartLevel(registry, level);
+                    const unlocked = SaveDataService.getAutoStartUnlocked(registry);
+                    if (!unlocked) {
+                        // First purchase: unlock the feature
+                        SaveDataService.setAutoStartUnlocked(registry, true);
+                    } else {
+                        // Subsequent purchases: increment level
+                        const currentLevel = SaveDataService.getAutoStartLevel(registry);
+                        SaveDataService.setAutoStartLevel(registry, currentLevel + 1);
+                    }
                 }
             },
             prestige: {
@@ -393,8 +407,15 @@ class UpgradeService {
      * Purchase an upgrade
      */
     static purchaseUpgrade(registry, upgradeType, config) {
-        const multiplier = config.multiplier || 1.6;
-        const cost = this.calculateCost(config.basePrice, config.level, multiplier);
+        // Special cost calculation for auto-start
+        let cost;
+        if (upgradeType === 'autoStart') {
+            const unlocked = SaveDataService.getAutoStartUnlocked(registry);
+            cost = unlocked ? 200 : 100;
+        } else {
+            const multiplier = config.multiplier || 1.6;
+            cost = this.calculateCost(config.basePrice, config.level, multiplier);
+        }
 
         if (!SaveDataService.canAfford(registry, cost)) {
             return { success: false, reason: 'insufficient_funds' };
@@ -411,9 +432,11 @@ class UpgradeService {
         // Deduct cost
         SaveDataService.subtractSkulls(registry, cost);
 
-        // Increment level using the correct registry key
-        const registryKey = config.registryKey || upgradeType;
-        SaveDataService.incrementUpgradeLevel(registry, registryKey);
+        // Increment level using the correct registry key (skip for auto-start - it handles its own logic)
+        if (upgradeType !== 'autoStart') {
+            const registryKey = config.registryKey || upgradeType;
+            SaveDataService.incrementUpgradeLevel(registry, registryKey);
+        }
 
         // Call onPurchase callback if exists
         if (config.onPurchase) {
@@ -426,9 +449,16 @@ class UpgradeService {
     /**
      * Check if an upgrade can be purchased
      */
-    static canPurchaseUpgrade(registry, config) {
-        const multiplier = config.multiplier || 1.6;
-        const cost = this.calculateCost(config.basePrice, config.level, multiplier);
+    static canPurchaseUpgrade(registry, config, upgradeType) {
+        // Special cost calculation for auto-start
+        let cost;
+        if (upgradeType === 'autoStart') {
+            const unlocked = SaveDataService.getAutoStartUnlocked(registry);
+            cost = unlocked ? 200 : 100;
+        } else {
+            const multiplier = config.multiplier || 1.6;
+            cost = this.calculateCost(config.basePrice, config.level, multiplier);
+        }
 
         if (!SaveDataService.canAfford(registry, cost)) {
             return false;
