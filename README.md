@@ -48,8 +48,8 @@ build-android.bat
 copy /Y index.html www\index.html
 xcopy /E /I /Y src www\src
 
-# 2. Sync to Android project
-npx cap sync android
+# 2. Copy to Android project
+npx cap copy android
 ```
 
 This is necessary because:
@@ -149,6 +149,36 @@ gradlew.bat --stop
 gradlew.bat clean
 gradlew.bat assembleDebug
 ```
+
+#### APK Contains Old Code
+
+If your APK is building with old code even after running the build script:
+
+**Cause:** The `android/app/src/main/assets/` directory wasn't created or updated. Capacitor needs to copy web files from `www/` to this assets directory, but `npx cap sync` sometimes doesn't create it.
+
+**Solution:** Use `npx cap copy android` instead of `npx cap sync android`. The build script has been updated to use `copy`.
+
+**Manual fix:**
+```cmd
+# 1. Copy current code to www
+copy /Y index.html www\index.html
+xcopy /E /I /Y src www\src
+
+# 2. Copy to Android (this creates/updates assets directory)
+npx cap copy android
+
+# 3. Clean build to ensure Gradle uses new files
+cd android
+gradlew.bat clean
+gradlew.bat assembleDebug
+```
+
+**Verify the fix:**
+Check that your latest code is in the Android assets:
+```cmd
+ls android/app/src/main/assets/public/src/scenes/
+```
+You should see your latest scene files (e.g., ShopRefactored.js, Altar.js).
 
 ## Game Features
 

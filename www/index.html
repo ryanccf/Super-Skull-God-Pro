@@ -28,21 +28,45 @@
     <!-- Config -->
     <script src="src/config/Colors.js"></script>
     <script src="src/config/GameConfig.js"></script>
-    
-    <!-- Utils -->
+    <script src="src/config/UIConfig.js"></script>
+    <script src="src/config/PhysicsConfig.js"></script>
+
+    <!-- Services (must load before components/managers) -->
+    <script src="src/services/SaveDataService.js"></script>
+    <script src="src/services/ParticleService.js"></script>
+    <script src="src/services/UpgradeService.js"></script>
+
+    <!-- UI Components -->
+    <script src="src/components/ui/Panel.js"></script>
+    <script src="src/components/ui/Button.js"></script>
+    <script src="src/components/ui/Card.js"></script>
+    <script src="src/components/ui/CardGrid.js"></script>
+    <script src="src/components/ui/UpgradeButton.js"></script>
+
+    <!-- Managers -->
+    <script src="src/managers/InputManager.js"></script>
+    <script src="src/managers/UIManager.js"></script>
+    <script src="src/managers/CollisionManager.js"></script>
+
+    <!-- Utils (legacy) -->
     <script src="src/utils/GameUtils.js"></script>
     <script src="src/utils/AssetCreator.js"></script>
     <script src="src/utils/PositionManager.js"></script>
-    
+    <script src="src/utils/FlipperManipulator.js"></script>
+    <script src="src/utils/TriangleManipulator.js"></script>
+    <script src="src/utils/BoosterManipulator.js"></script>
+
     <!-- Entities -->
     <script src="src/entities/Skull.js"></script>
-    
+
     <!-- Scenes -->
     <script src="src/scenes/Boot.js"></script>
     <script src="src/scenes/Preloader.js"></script>
     <script src="src/scenes/MainMenu.js"></script>
     <script src="src/scenes/Settings.js"></script>
-    <script src="src/scenes/Shop.js"></script>
+    <script src="src/scenes/ShopRefactored.js"></script>
+    <script src="src/scenes/Altar.js"></script>
+    <script src="src/scenes/Lightbox.js"></script>
     <script src="src/scenes/ClickerGame.js"></script>
     <script src="src/scenes/GameOver.js"></script>
     
@@ -70,7 +94,9 @@
                 Preloader,
                 MainMenu,
                 Settings,
-                Shop,
+                ShopRefactored,
+                Altar,
+                Lightbox,
                 ClickerGame,
                 GameOver
             ]

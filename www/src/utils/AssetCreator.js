@@ -184,6 +184,113 @@ class AssetCreator {
         bigSkullCanvas.destroy();
     }
 
+    static createTriangle(scene) {
+        const triangleCanvas = scene.add.graphics();
+
+        // Board - 120px width, 30px height (half as tall)
+        const width = 120;
+        const height = 30;
+
+        // Center the rectangle
+        const centerX = 60;
+        const centerY = 15;
+
+        triangleCanvas.fillStyle(0xFF8C42);  // Orange
+        triangleCanvas.fillRect(centerX - width/2, centerY - height/2, width, height);
+
+        triangleCanvas.lineStyle(6, 0x000000);  // Black border, thicker
+        triangleCanvas.strokeRect(centerX - width/2, centerY - height/2, width, height);
+
+        triangleCanvas.generateTexture('triangle', 120, 30);
+        triangleCanvas.destroy();
+    }
+
+    static createBooster(scene) {
+        const boosterCanvas = scene.add.graphics();
+        const length = 120;  // Same as box width
+        const width = 30;
+
+        // Green rectangle with 50% opacity
+        boosterCanvas.fillStyle(0x00FF00, 0.5);
+        boosterCanvas.fillRect(0, 0, length, width);
+
+        // Arrow head at the right end
+        boosterCanvas.fillStyle(0x00FF00, 0.5);
+        boosterCanvas.beginPath();
+        boosterCanvas.moveTo(length, width / 2);  // Arrow tip
+        boosterCanvas.lineTo(length - 20, 0);     // Top corner
+        boosterCanvas.lineTo(length - 20, width); // Bottom corner
+        boosterCanvas.closePath();
+        boosterCanvas.fillPath();
+
+        boosterCanvas.generateTexture('booster', length + 20, width);
+        boosterCanvas.destroy();
+    }
+
+    static createShrinker(scene) {
+        const shrinkerCanvas = scene.add.graphics();
+        const radius = 20;  // Small circle
+
+        // Pink circle with 60% opacity
+        shrinkerCanvas.fillStyle(0xFF69B4, 0.6);
+        shrinkerCanvas.fillCircle(radius, radius, radius);
+
+        // Pink border
+        shrinkerCanvas.lineStyle(3, 0xFF1493, 0.8);
+        shrinkerCanvas.strokeCircle(radius, radius, radius);
+
+        shrinkerCanvas.generateTexture('shrinker', radius * 2, radius * 2);
+        shrinkerCanvas.destroy();
+    }
+
+    static createDuplicator(scene) {
+        const duplicatorCanvas = scene.add.graphics();
+        const radius = 20;  // Small circle
+
+        // Blue circle with 60% opacity
+        duplicatorCanvas.fillStyle(0x4169E1, 0.6);
+        duplicatorCanvas.fillCircle(radius, radius, radius);
+
+        // Darker blue border
+        duplicatorCanvas.lineStyle(3, 0x1E3A8A, 0.8);
+        duplicatorCanvas.strokeCircle(radius, radius, radius);
+
+        duplicatorCanvas.generateTexture('duplicator', radius * 2, radius * 2);
+        duplicatorCanvas.destroy();
+    }
+
+    static createPortalBlue(scene) {
+        const portalCanvas = scene.add.graphics();
+        const radius = 20;  // Small circle
+
+        // Blue portal with 70% opacity
+        portalCanvas.fillStyle(0x0080FF, 0.7);
+        portalCanvas.fillCircle(radius, radius, radius);
+
+        // Cyan border
+        portalCanvas.lineStyle(3, 0x00FFFF, 0.9);
+        portalCanvas.strokeCircle(radius, radius, radius);
+
+        portalCanvas.generateTexture('portal_blue', radius * 2, radius * 2);
+        portalCanvas.destroy();
+    }
+
+    static createPortalOrange(scene) {
+        const portalCanvas = scene.add.graphics();
+        const radius = 20;  // Small circle
+
+        // Orange portal with 70% opacity
+        portalCanvas.fillStyle(0xFF8000, 0.7);
+        portalCanvas.fillCircle(radius, radius, radius);
+
+        // Yellow border
+        portalCanvas.lineStyle(3, 0xFFFF00, 0.9);
+        portalCanvas.strokeCircle(radius, radius, radius);
+
+        portalCanvas.generateTexture('portal_orange', radius * 2, radius * 2);
+        portalCanvas.destroy();
+    }
+
     static createFloor(scene) {
         const floorCanvas = scene.add.graphics();
         const floorHeight = GAME_CONFIG.WORLD_HEIGHT - GAME_CONFIG.FLOOR_Y;
