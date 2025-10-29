@@ -34,12 +34,14 @@ python3 -m http.server 8000
 
 ### Sync Web Assets to Android
 
-Before building, sync your web code changes to the Android project:
+**IMPORTANT:** Before building, you MUST sync your web code changes to the Android project:
 
 ```bash
-# From project root
+# From project root (not the android folder!)
 npx cap sync android
 ```
+
+This copies your web files (HTML, CSS, JS, assets) from `src/` into the Android project. Without this step, your APK will contain old code!
 
 ### Build APK on Windows
 
@@ -105,6 +107,29 @@ Make sure you have JDK 17 or higher installed. You can download it from:
 To check your Java version:
 ```cmd
 java -version
+javac -version
+```
+
+To verify Gradle is using the correct Java:
+```cmd
+cd android
+gradlew.bat -version
+```
+
+If Gradle is not detecting Java 21, you may need to:
+
+1. **Set JAVA_HOME environment variable** (if the installer didn't):
+   - Search for "Environment Variables" in Windows
+   - Add/Edit `JAVA_HOME` to point to your JDK 21 installation (e.g., `C:\Program Files\Eclipse Adoptium\jdk-21.x.x.x`)
+   - Add `%JAVA_HOME%\bin` to your PATH
+   - **Restart your command prompt** after changing environment variables
+
+2. **Clear Gradle cache and rebuild**:
+```cmd
+cd android
+gradlew.bat --stop
+gradlew.bat clean
+gradlew.bat assembleDebug
 ```
 
 ## Game Features
