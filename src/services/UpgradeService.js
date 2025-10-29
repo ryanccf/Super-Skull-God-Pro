@@ -358,12 +358,12 @@ class UpgradeService {
                 registryKey: 'prestige',
                 level: SaveDataService.getPrestigeLevel(registry),
                 multiplier: 2,
-                description: '2X Skull Value, +1 Max Duplicators, Resets Progress',
+                description: '2X Skull Value, +1 Max Duplicators, Resets All (Upgrades, Items, Cards)',
                 getValue: (level) => {
                     const multiplier = Math.pow(2, level);
                     return `${multiplier}X Value`;
                 },
-                onPurchase: (registry, level) => {
+                onPurchase: (registry, level, scene) => {
                     // Increase prestige level and multiplier
                     SaveDataService.setPrestigeLevel(registry, level);
                     SaveDataService.setPrestigeMultiplier(registry, Math.pow(2, level));
@@ -398,6 +398,19 @@ class UpgradeService {
                     registry.set('autoStartUnlocked', false);
                     registry.set('autoStartLevel', 0);
                     registry.set('autoStartEnabled', false);
+                    registry.set('fastForwardEnabled', false);
+
+                    // Reset all unlocked cards
+                    registry.set('unlockedItems', []);
+
+                    // Reset card bonuses
+                    registry.set('bumperMaxMultiplier', 4);
+                    registry.set('cardBonusGameTime', 0);
+                    registry.set('cardBonusMaxSkulls', 0);
+                    registry.set('cardBonusFlipperAddition', 0);
+
+                    // Set flag to show prestige screen
+                    registry.set('justPrestiged', true);
                 }
             }
         };

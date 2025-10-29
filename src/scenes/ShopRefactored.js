@@ -148,8 +148,13 @@ class ShopRefactored extends Phaser.Scene {
                 count: 10
             });
 
-            // Restart scene to show new items (like original shop)
-            this.scene.restart();
+            // Check if prestiged - go to MainMenu instead of restarting
+            if (upgradeType === 'prestige') {
+                this.scene.start('MainMenu');
+            } else {
+                // Restart scene to show new items (like original shop)
+                this.scene.restart();
+            }
         } else {
             // Show error feedback
             if (result.reason === 'insufficient_funds') {

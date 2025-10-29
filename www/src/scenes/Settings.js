@@ -21,6 +21,7 @@ class Settings extends Phaser.Scene {
         }).setOrigin(0.5);
 
         this.createMuteButtons(centerX);
+        this.createDebugButton(centerX);
         this.createResetButton(centerX);
         this.createBackButton(centerX);
         this.setupInput();
@@ -71,15 +72,59 @@ class Settings extends Phaser.Scene {
         });
     }
 
+    createDebugButton(centerX) {
+        const debugButtonBg = this.add.graphics();
+        debugButtonBg.fillStyle(0xFFD700); // Gold color
+        debugButtonBg.fillRoundedRect(centerX - 200, 460, 400, 50, 10);
+        debugButtonBg.lineStyle(3, 0x000000);
+        debugButtonBg.strokeRoundedRect(centerX - 200, 460, 400, 50, 10);
+        debugButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 200, 460, 400, 50), Phaser.Geom.Rectangle.Contains);
+
+        this.add.text(centerX, 485, 'DEBUG: Add 1 Million Skulls', {
+            fontFamily: 'Arial Black',
+            fontSize: 22,
+            color: '#000000'
+        }).setOrigin(0.5);
+
+        debugButtonBg.on('pointerdown', () => this.addDebugSkulls());
+    }
+
+    addDebugSkulls() {
+        const currentSkulls = this.registry.get('totalSkulls') || 0;
+        this.registry.set('totalSkulls', currentSkulls + 1000000);
+
+        // Show feedback
+        const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+        const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
+
+        const feedbackText = this.add.text(centerX, centerY, '+1,000,000 Skulls!', {
+            fontFamily: 'Arial Black',
+            fontSize: 48,
+            color: '#FFD700',
+            stroke: '#000000',
+            strokeThickness: 6
+        }).setOrigin(0.5).setDepth(1000);
+
+        this.tweens.add({
+            targets: feedbackText,
+            y: centerY - 100,
+            alpha: 0,
+            duration: 2000,
+            onComplete: () => feedbackText.destroy()
+        });
+
+        GameUtils.createParticleEffect(this, centerX, centerY, 0xFFD700, 20);
+    }
+
     createResetButton(centerX) {
         const resetButtonBg = this.add.graphics();
         resetButtonBg.fillStyle(0xCC0000);
-        resetButtonBg.fillRoundedRect(centerX - 150, 520, 300, 80, 10);
+        resetButtonBg.fillRoundedRect(centerX - 150, 530, 300, 80, 10);
         resetButtonBg.lineStyle(3, 0x000000);
-        resetButtonBg.strokeRoundedRect(centerX - 150, 520, 300, 80, 10);
-        resetButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 150, 520, 300, 80), Phaser.Geom.Rectangle.Contains);
+        resetButtonBg.strokeRoundedRect(centerX - 150, 530, 300, 80, 10);
+        resetButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 150, 530, 300, 80), Phaser.Geom.Rectangle.Contains);
 
-        this.add.text(centerX, 560, 'RESET EVERYTHING', {
+        this.add.text(centerX, 570, 'RESET EVERYTHING', {
             fontFamily: 'Arial Black',
             fontSize: 24,
             color: '#000000'
@@ -88,9 +133,9 @@ class Settings extends Phaser.Scene {
         // White backdrop for warning
         const warningBackdrop = this.add.graphics();
         warningBackdrop.fillStyle(0xffffff, 0.9);
-        warningBackdrop.fillRoundedRect(centerX - 300, 620, 600, 40, 12);
+        warningBackdrop.fillRoundedRect(centerX - 300, 630, 600, 40, 12);
 
-        this.add.text(centerX, 640, 'Warning: This will reset all your progress!', {
+        this.add.text(centerX, 650, 'Warning: This will reset all your progress!', {
             fontFamily: 'Arial',
             fontSize: 20,
             color: '#000000'
@@ -102,12 +147,12 @@ class Settings extends Phaser.Scene {
     createBackButton(centerX) {
         const backButtonBg = this.add.graphics();
         backButtonBg.fillStyle(COLORS.ROYAL_BLUE);
-        backButtonBg.fillRoundedRect(centerX - 100, 690, 200, 60, 10);
+        backButtonBg.fillRoundedRect(centerX - 100, 700, 200, 60, 10);
         backButtonBg.lineStyle(3, 0x000000);
-        backButtonBg.strokeRoundedRect(centerX - 100, 690, 200, 60, 10);
-        backButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 100, 690, 200, 60), Phaser.Geom.Rectangle.Contains);
+        backButtonBg.strokeRoundedRect(centerX - 100, 700, 200, 60, 10);
+        backButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 100, 700, 200, 60), Phaser.Geom.Rectangle.Contains);
 
-        this.add.text(centerX, 720, 'BACK', {
+        this.add.text(centerX, 730, 'BACK', {
             fontFamily: 'Arial Black',
             fontSize: 28,
             color: '#000000'

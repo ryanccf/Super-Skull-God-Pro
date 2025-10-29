@@ -5,6 +5,14 @@ class MainMenu extends Phaser.Scene {
 
     create() {
         this.setupBackground();
+
+        // Check if just prestiged and show message
+        const justPrestiged = this.registry.get('justPrestiged');
+        if (justPrestiged) {
+            this.registry.set('justPrestiged', false);
+            this.showPrestigeMessage();
+        }
+
         this.createUI();
         this.setupInputHandlers();
 
@@ -27,6 +35,7 @@ class MainMenu extends Phaser.Scene {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const totalSkulls = this.registry.get('totalSkulls');
         const highscore = this.registry.get('highscore');
+        const prestigeLevel = this.registry.get('prestigeLevel') || 0;
 
         const textStyle = {
             fontFamily: 'Arial Black',
@@ -34,15 +43,16 @@ class MainMenu extends Phaser.Scene {
             color: '#000000'
         };
 
-        // White backdrop for stats
+        // White backdrop for stats (taller to fit prestige)
         const statsBackdrop = this.add.graphics();
         statsBackdrop.fillStyle(0xffffff, 0.9);
-        statsBackdrop.fillRoundedRect(20, 20, 550, 100, 12);
+        statsBackdrop.fillRoundedRect(20, 20, 550, 145, 12);
 
         const totalSkullsText = this.add.text(32, 32, `Total Skulls: ${totalSkulls}`, textStyle);
         const bestRoundText = this.add.text(32, 80, `Best Round: ${highscore}`, textStyle);
+        const prestigeText = this.add.text(32, 128, `Prestige: ${prestigeLevel}`, textStyle);
 
-        this.addFloatingAnimation([statsBackdrop, totalSkullsText, bestRoundText]);
+        this.addFloatingAnimation([statsBackdrop, totalSkullsText, bestRoundText, prestigeText]);
 
         const instructions = [
             "SUPER SKULL GOD PRO",
@@ -263,6 +273,44 @@ class MainMenu extends Phaser.Scene {
         } else if (this.autoStartTimerText) {
             this.autoStartTimerText.setText('');
         }
+    }
+
+    showPrestigeMessage() {
+        const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+        const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
+
+        // Create big gold "PRESTIGE!" text
+        const prestigeText = this.add.text(centerX, centerY, 'PRESTIGE!', {
+            fontFamily: 'Arial Black',
+            fontSize: 120,
+            color: '#FFD700',
+            stroke: '#000000',
+            strokeThickness: 12
+        }).setOrigin(0.5).setDepth(1000);
+
+        // Pulse animation
+        this.tweens.add({
+            targets: prestigeText,
+            scaleX: 1.2,
+            scaleY: 1.2,
+            duration: 500,
+            yoyo: true,
+            repeat: 3
+        });
+
+        // Fade out after 3 seconds
+        this.tweens.add({
+            targets: prestigeText,
+            alpha: 0,
+            duration: 1000,
+            delay: 2500,
+            onComplete: () => {
+                prestigeText.destroy();
+            }
+        });
+
+        // Particle burst
+        GameUtils.createParticleEffect(this, centerX, centerY, 0xFFD700, 30);
     }
 
     shutdown() {

@@ -159,6 +159,7 @@ const DEFAULT_SAVE_DATA = {
     prestigeLevel: 0,
     prestigeMultiplier: 1,
     fastForwardEnabled: false,
+    justPrestiged: false,
     // Card upgrade bonuses
     bumperMaxMultiplier: 4,  // Base max multiplier for bumpers
     cardBonusGameTime: 0,    // Bonus time from cards
