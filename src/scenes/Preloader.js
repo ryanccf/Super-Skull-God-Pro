@@ -73,6 +73,11 @@ class Preloader extends Phaser.Scene {
         this.load.image('booster_pack', 'src/assets/images/cards/Skull God Pack.png');
         this.load.image('card_back', 'src/assets/images/cards/card_back.png');
         this.load.image('card_face', 'src/assets/images/cards/CardFace.png');
+
+        // Load conga line characters (multiple variants)
+        for (let i = 1; i <= 6; i++) {
+            this.load.image(`conga_guy_${i}`, `src/assets/images/conga line/conga_guy_${i}.png`);
+        }
     }
 
     create() {

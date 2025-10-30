@@ -3,7 +3,7 @@ const GAME_CONFIG = {
     WORLD_HEIGHT: 768,
     PLAY_AREA_WIDTH: 1024,
     SIDEBAR_WIDTH: 342,
-    FLOOR_Y: 680,
+    FLOOR_Y: 740,
     GRAVITY: 400,
     PHYSICS_BOUNDS: {
         x: 0,

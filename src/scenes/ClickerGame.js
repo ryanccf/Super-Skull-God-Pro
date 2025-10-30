@@ -152,7 +152,63 @@ class ClickerGame extends Phaser.Scene {
         const scale = Math.max(scaleX, scaleY);
         bg.setScale(scale);
 
-        this.add.image(512, GAME_CONFIG.FLOOR_Y, 'floor').setOrigin(0.5, 0);
+        // Visual floor (half height - 50px, black with white lines)
+        const floorGraphics = this.add.graphics();
+        floorGraphics.fillStyle(0x000000); // Black floor
+        floorGraphics.fillRect(0, GAME_CONFIG.FLOOR_Y, GAME_CONFIG.PLAY_AREA_WIDTH, 50);
+
+        // Add white horizontal lines
+        floorGraphics.lineStyle(2, 0xFFFFFF);
+        for (let i = 0; i <= GAME_CONFIG.PLAY_AREA_WIDTH; i += 50) {
+            floorGraphics.beginPath();
+            floorGraphics.moveTo(i, GAME_CONFIG.FLOOR_Y);
+            floorGraphics.lineTo(i, GAME_CONFIG.FLOOR_Y + 50);
+            floorGraphics.strokePath();
+        }
+        floorGraphics.setDepth(10);
+
+        // Visual top barrier (50px tall at top, one-way, solid light brown)
+        const topBarrierGraphics = this.add.graphics();
+        topBarrierGraphics.fillStyle(0xD2B48C); // Light brown, solid
+        topBarrierGraphics.fillRect(0, 0, GAME_CONFIG.PLAY_AREA_WIDTH, 50);
+        topBarrierGraphics.setDepth(10);
+
+        // Create animated conga line of people (efficient - no physics, just sprites)
+        this.personSpacing = 30;
+        this.congoLineContainer = this.add.container(0, 0);
+        this.congoLineContainer.setDepth(11);
+        this.congoLineAnimating = false; // Flag to prevent overlapping animations
+
+        // Create sprite instances for conga line - randomly choose from 6 variants
+        // Create enough sprites so each one travels the full screen width before wrapping
+        // This makes the same character visible moving across the entire screen
+        const numPeople = Math.ceil((GAME_CONFIG.PLAY_AREA_WIDTH * 4) / this.personSpacing);
+        for (let i = 0; i < numPeople; i++) {
+            const personX = i * this.personSpacing;
+            const personY = 25;
+
+            // Randomly select one of the 6 conga guy variants (set once, stays the same)
+            const randomGuy = Phaser.Math.Between(1, 6);
+            const spriteKey = `conga_guy_${randomGuy}`;
+
+            // Create sprite instance - no physics, just a visual sprite
+            const sprite = this.add.sprite(personX, personY, spriteKey);
+            sprite.setOrigin(0.5, 0.5); // Center origin
+
+            this.congoLineContainer.add(sprite);
+        }
+
+        // Store the total width for wrapping logic
+        this.congoLineTotalWidth = numPeople * this.personSpacing;
+
+        // Start with offset so sprites appear from the left
+        this.congoLineContainer.x = -GAME_CONFIG.PLAY_AREA_WIDTH;
+
+        // Mask to clip people to only the ceiling area (play area width, not full screen)
+        const mask = this.add.graphics();
+        mask.fillStyle(0xffffff);
+        mask.fillRect(0, 0, GAME_CONFIG.PLAY_AREA_WIDTH, 50);
+        this.congoLineContainer.setMask(mask.createGeometryMask());
 
         // Create dark grey sidebar
         const sidebar = this.add.graphics();
@@ -185,33 +241,98 @@ class ClickerGame extends Phaser.Scene {
             restitution: 0.8
         });
 
-        // Bottom wall/floor (at FLOOR_Y position)
-        this.matter.add.rectangle(GAME_CONFIG.PLAY_AREA_WIDTH / 2, GAME_CONFIG.FLOOR_Y + 50, GAME_CONFIG.PLAY_AREA_WIDTH, 100, {
+        // Bottom wall/floor (at FLOOR_Y position) - half as tall
+        this.matter.add.rectangle(GAME_CONFIG.PLAY_AREA_WIDTH / 2, GAME_CONFIG.FLOOR_Y + 25, GAME_CONFIG.PLAY_AREA_WIDTH, 50, {
             isStatic: true,
             label: 'floor',
             restitution: 0.3
         });
     }
 
-    createUI() {
-        const sidebarX = GAME_CONFIG.PLAY_AREA_WIDTH + 30;
-        const textStyle = {
-            fontFamily: 'Arial Black',
-            fontSize: 32,
-            color: '#000000'
-        };
+    animateCongoLine() {
+        if (!this.congoLineContainer || this.congoLineAnimating) return;
 
-        // White backdrop for score display (increased height to fit all labels)
+        this.congoLineAnimating = true;
+
+        const currentX = this.congoLineContainer.x;
+        const targetX = currentX + this.personSpacing;
+
+        // Move container to the right (people appear to move right)
+        this.tweens.add({
+            targets: this.congoLineContainer,
+            x: targetX,
+            duration: 300,
+            ease: 'Linear',
+            onComplete: () => {
+                // Wrap around when we've scrolled far enough to the right
+                // Reset to create seamless infinite loop
+                if (this.congoLineContainer.x >= 0) {
+                    this.congoLineContainer.x -= this.congoLineTotalWidth;
+                }
+                this.congoLineAnimating = false;
+            }
+        });
+    }
+
+    createUI() {
+        // Create container for score display with consistent styling
+        const containerX = GAME_CONFIG.PLAY_AREA_WIDTH + 20;
+        const containerY = 25;
+        const containerWidth = 300;
+        const containerHeight = 250;
+        const padding = 20;
+        const lineHeight = 50;
+
+        // Create container to hold all UI elements
+        this.scoreContainer = this.add.container(containerX, containerY);
+        this.scoreContainer.setDepth(10);
+
+        // White backdrop for score display
         const scoreBackdrop = this.add.graphics();
         scoreBackdrop.fillStyle(0xffffff, 0.9);
-        scoreBackdrop.fillRoundedRect(sidebarX - 10, 25, 280, 250, 12);
-        scoreBackdrop.setDepth(0);
+        scoreBackdrop.fillRoundedRect(0, 0, containerWidth, containerHeight, 12);
+        this.scoreContainer.add(scoreBackdrop);
+
+        // Consistent text style for all labels
+        const labelStyle = {
+            fontFamily: 'Arial Black',
+            fontSize: 28,
+            color: '#000000',
+            align: 'left'
+        };
+
+        const valueStyle = {
+            fontFamily: 'Arial Black',
+            fontSize: 28,
+            color: '#333333',
+            align: 'right'
+        };
 
         const highscore = this.registry.get('highscore') || 0;
-        this.timeText = this.add.text(sidebarX, 40, `Time: ${this.gameTime}`, textStyle).setDepth(1);
-        this.roundScoreText = this.add.text(sidebarX, 85, `Round: ${this.roundScore}`, textStyle).setDepth(1);
-        this.highscoreText = this.add.text(sidebarX, 130, `Highest: ${highscore}`, textStyle).setDepth(1);
-        this.totalSkullsText = this.add.text(sidebarX, 175, `Total: ${this.totalSkulls}`, textStyle).setDepth(1);
+
+        // Create labels with consistent positioning
+        const labelX = padding;
+        const valueX = containerWidth - padding;
+
+        // Time
+        const timeLabel = this.add.text(labelX, padding, 'Time:', labelStyle);
+        this.timeText = this.add.text(valueX, padding, this.gameTime.toString(), valueStyle).setOrigin(1, 0);
+        this.scoreContainer.add([timeLabel, this.timeText]);
+
+        // Round Score
+        const roundLabel = this.add.text(labelX, padding + lineHeight, 'Round:', labelStyle);
+        this.roundScoreText = this.add.text(valueX, padding + lineHeight, this.roundScore.toString(), valueStyle).setOrigin(1, 0);
+        this.scoreContainer.add([roundLabel, this.roundScoreText]);
+
+        // Highest Score
+        const highestLabel = this.add.text(labelX, padding + lineHeight * 2, 'Highest:', labelStyle);
+        this.highscoreText = this.add.text(valueX, padding + lineHeight * 2, highscore.toString(), valueStyle).setOrigin(1, 0);
+        this.scoreContainer.add([highestLabel, this.highscoreText]);
+
+        // Total Skulls
+        const totalLabel = this.add.text(labelX, padding + lineHeight * 3, 'Total:', labelStyle);
+        this.totalSkullsText = this.add.text(valueX, padding + lineHeight * 3, this.totalSkulls.toString(), valueStyle).setOrigin(1, 0);
+        this.scoreContainer.add([totalLabel, this.totalSkullsText]);
 
         // Auto-start UI (only show if unlocked)
         if (this.registry.get('autoStartUnlocked')) {
@@ -1103,6 +1224,7 @@ class ClickerGame extends Phaser.Scene {
                             this.handleBoosterCollision(skull.sprite, other);
                         }
                     }
+
                 });
             } catch (e) {
                 // Silently ignore collision errors during cleanup
@@ -1286,6 +1408,9 @@ class ClickerGame extends Phaser.Scene {
         this.skullObjects.push(skull);
 
         this.setupCollisionForSkull(skull);
+
+        // Animate congo line when skull drops
+        this.animateCongoLine();
     }
 
     handleSkullClick(sprite) {
@@ -1570,13 +1695,14 @@ class ClickerGame extends Phaser.Scene {
     }
 
     updateScoreDisplay() {
-        this.roundScoreText.setText(`Round: ${this.roundScore}`);
-        this.totalSkullsText.setText(`Total: ${this.totalSkulls}`);
+        // Update only the value text (labels are static)
+        this.roundScoreText.setText(this.roundScore.toString());
+        this.totalSkullsText.setText(this.totalSkulls.toString());
 
         // Update highest score display if current round exceeds it
         const currentHighscore = this.registry.get('highscore') || 0;
         if (this.roundScore > currentHighscore) {
-            this.highscoreText.setText(`Highest: ${this.roundScore}`);
+            this.highscoreText.setText(this.roundScore.toString());
         }
 
         this.tweens.add({
@@ -1714,7 +1840,8 @@ class ClickerGame extends Phaser.Scene {
 
         // Wrap entire update in try-catch to catch any remaining issues
         try {
-            this.timeText.setText(`Time: ${Math.ceil(this.timer.getRemainingSeconds())}`);
+            // Update only the value (label is static)
+            this.timeText.setText(Math.ceil(this.timer.getRemainingSeconds()).toString());
 
             // Check for out-of-bounds skulls and clean them up
             const skullsToRemove = [];
