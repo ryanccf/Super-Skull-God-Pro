@@ -106,30 +106,30 @@ class AssetCreator {
     static createFlipper(scene) {
         const flipperCanvas = scene.add.graphics();
 
-        // Coffin shape - wider at shoulder, narrower at foot
+        // Coffin shape - wider at shoulder, narrower at foot (2x size)
         flipperCanvas.fillStyle(0xE87461);  // Coral from palette
         flipperCanvas.beginPath();
-        flipperCanvas.moveTo(60, 7.5);
-        flipperCanvas.lineTo(45, 0);
-        flipperCanvas.lineTo(15, 0);
-        flipperCanvas.lineTo(0, 7.5);
-        flipperCanvas.lineTo(15, 15);
-        flipperCanvas.lineTo(45, 15);
+        flipperCanvas.moveTo(120, 15);
+        flipperCanvas.lineTo(90, 0);
+        flipperCanvas.lineTo(30, 0);
+        flipperCanvas.lineTo(0, 15);
+        flipperCanvas.lineTo(30, 30);
+        flipperCanvas.lineTo(90, 30);
         flipperCanvas.closePath();
         flipperCanvas.fillPath();
 
-        flipperCanvas.lineStyle(3, 0xB34E00);  // Dark orange from palette
+        flipperCanvas.lineStyle(6, 0xB34E00);  // Dark orange from palette (doubled thickness)
         flipperCanvas.beginPath();
-        flipperCanvas.moveTo(60, 7.5);
-        flipperCanvas.lineTo(45, 0);
-        flipperCanvas.lineTo(15, 0);
-        flipperCanvas.lineTo(0, 7.5);
-        flipperCanvas.lineTo(15, 15);
-        flipperCanvas.lineTo(45, 15);
+        flipperCanvas.moveTo(120, 15);
+        flipperCanvas.lineTo(90, 0);
+        flipperCanvas.lineTo(30, 0);
+        flipperCanvas.lineTo(0, 15);
+        flipperCanvas.lineTo(30, 30);
+        flipperCanvas.lineTo(90, 30);
         flipperCanvas.closePath();
         flipperCanvas.strokePath();
 
-        flipperCanvas.generateTexture('flipper', 60, 15);
+        flipperCanvas.generateTexture('flipper', 120, 30);
         flipperCanvas.destroy();
     }
 

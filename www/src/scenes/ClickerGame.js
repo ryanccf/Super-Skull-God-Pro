@@ -614,9 +614,9 @@ class ClickerGame extends Phaser.Scene {
             const flipper = this.add.image(pos.x, pos.y, 'flipper');
             flipper.setInteractive({ draggable: true });
 
-            // Create Matter body - rectangle that rotates with sprite
+            // Create Matter body - rectangle that rotates with sprite (2x size matches asset)
             this.matter.add.gameObject(flipper, {
-                shape: { type: 'rectangle', width: 60, height: 15 },
+                shape: { type: 'rectangle', width: 156, height: 30 },
                 isStatic: true,
                 label: 'flipper'
             });
@@ -630,13 +630,14 @@ class ClickerGame extends Phaser.Scene {
 
             // Load scaleX if flipper was flipped (default to 1 if not set)
             const scaleX = pos.scaleX !== undefined ? pos.scaleX : 1;
-            flipper.setScale(scaleX, 1);  // setScale updates both sprite and Matter body
+            flipper.setScale(scaleX, 1);  // No additional scaling - asset is already 2x
 
             // Store the base scale - this is the "true" scale without animations
             flipper.baseScaleX = scaleX;
 
             // Load saved angle or use default (in degrees)
-            const angle = pos.angle !== undefined ? pos.angle : (pos.facingLeft ? 30 : -30);
+            // Left flipper rests at 120° (pointing down-right), right flipper at -120° (pointing down-left)
+            const angle = pos.angle !== undefined ? pos.angle : (pos.facingLeft ? 120 : -120);
             flipper.setRotation(Phaser.Math.DegToRad(angle));  // setRotation updates both sprite and body
 
             // Store the base angle - this is the "true" angle without animations
@@ -644,6 +645,7 @@ class ClickerGame extends Phaser.Scene {
 
             flipper.facingLeft = pos.facingLeft;
             flipper.flipper = true;  // Identification property
+            flipper.isReady = true;  // Flipper is ready to activate on collision
             this.flipperSprites.push(flipper);
 
             this.setupFlipperDragging(flipper);
@@ -1241,6 +1243,56 @@ class ClickerGame extends Phaser.Scene {
         // This function is kept for compatibility but does nothing
     }
 
+    activateFlipper(flipper) {
+        // Rotate flipper up and back down like a pinball machine
+        if (!flipper || !flipper.body || !flipper.isReady || this.tweens.isTweening(flipper)) return;
+
+        // Mark flipper as not ready (can't activate again until reset)
+        flipper.isReady = false;
+
+        // Calculate target angle based on current scaleX (handles mirroring correctly)
+        // Positive scaleX (normal): rotate counterclockwise (-60°)
+        // Negative scaleX (flipped): rotate clockwise (+60°)
+        const baseAngle = flipper.baseAngle;
+        const rotationDirection = flipper.scaleX > 0 ? -60 : 60;
+        const activatedAngle = baseAngle + rotationDirection;
+
+        // Rotate up quickly
+        this.tweens.add({
+            targets: flipper,
+            angle: activatedAngle,
+            duration: 50,
+            ease: 'Power2',
+            onUpdate: () => {
+                // Update physics body rotation to match sprite
+                if (flipper.body) {
+                    this.matter.body.setAngle(flipper.body, Phaser.Math.DegToRad(flipper.angle));
+                }
+            },
+            onComplete: () => {
+                // Rotate back down to rest position
+                this.tweens.add({
+                    targets: flipper,
+                    angle: baseAngle,
+                    duration: 150,
+                    ease: 'Power2',
+                    onUpdate: () => {
+                        // Update physics body rotation to match sprite
+                        if (flipper.body) {
+                            this.matter.body.setAngle(flipper.body, Phaser.Math.DegToRad(flipper.angle));
+                        }
+                    },
+                    onComplete: () => {
+                        // Reset - flipper is ready again (no cooldown)
+                        if (flipper) {
+                            flipper.isReady = true;
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     setupInput() {
         // Flag to track if gameobjectdown fired this click
         // Phaser guarantees gameobjectdown fires BEFORE pointerdown
@@ -1292,6 +1344,7 @@ class ClickerGame extends Phaser.Scene {
                 } else if (gameObject.texture.key === 'flipper') {
                     const flipper = this.flipperSprites.find(f => f === gameObject);
                     if (flipper) {
+                        // Select flipper for manipulation (don't activate on click)
                         this.deselectTriangle();
                         this.deselectBooster();
                         this.selectFlipper(flipper);
@@ -1471,18 +1524,20 @@ class ClickerGame extends Phaser.Scene {
         const skullObj = this.skullObjects.find(c => c.sprite === skullSprite);
         if (!skullObj || !skullObj.canHitFlipper(flipper)) return;
 
-        // Calculate force based on flipper's actual rotation angle
-        const flipperAngle = flipper.rotation;
-        const forceMagnitude = 500;
+        // Activate flipper when ball touches it (if ready)
+        this.activateFlipper(flipper);
 
-        // Force perpendicular to flipper surface (normal vector)
-        // Adding 90 degrees (PI/2) to get perpendicular direction
-        const forceAngle = flipperAngle + Math.PI / 2;
+        // Add value bonus
+        const baseAddition = 1;
+        const cardBonus = this.registry.get('cardBonusFlipperAddition') || 0;
+        skullObj.value += baseAddition + cardBonus;
+        if (skullObj.valueText) {
+            skullObj.valueText.setText(skullObj.value.toString());
+        }
 
-        const horizontalForce = Math.cos(forceAngle) * forceMagnitude * (flipper.scaleX > 0 ? 1 : -1);
-        const verticalForce = Math.sin(forceAngle) * forceMagnitude;
+        skullObj.flipperCooldown = 5;
+        skullObj.lastFlipperHit = flipper;
 
-        skullObj.hitFlipper(flipper, horizontalForce, verticalForce);
         this.showFlipperEffect(flipper);
     }
 

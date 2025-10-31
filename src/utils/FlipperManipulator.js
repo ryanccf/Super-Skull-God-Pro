@@ -58,8 +58,10 @@ class FlipperManipulator {
                 dragY
             );
 
-            // setRotation updates both sprite and Matter body
-            this.flipper.setRotation(angle);
+            // Update Matter body angle directly
+            this.scene.matter.body.setAngle(this.flipper.body, angle);
+            // Sync sprite rotation to match body
+            this.flipper.rotation = angle;
             this.flipper.baseAngle = Phaser.Math.RadToDeg(angle); // Update base angle
 
             this.updateUI();
@@ -95,12 +97,24 @@ class FlipperManipulator {
         // Toggle facingLeft property
         this.flipper.facingLeft = !this.flipper.facingLeft;
 
+        // Flip the angle to the opposite side (mirror the rotation)
+        this.flipper.baseAngle = -this.flipper.baseAngle;
+
+        // Update Matter body angle directly
+        if (this.flipper.body) {
+            const newAngle = Phaser.Math.DegToRad(this.flipper.baseAngle);
+            this.scene.matter.body.setAngle(this.flipper.body, newAngle);
+            // Sync sprite rotation to match body
+            this.flipper.rotation = newAngle;
+        }
+
         // Update saved position
         const flipperPositions = this.scene.registry.get('flippers');
         const index = this.scene.flipperSprites.indexOf(this.flipper);
         if (index !== -1 && flipperPositions[index]) {
             flipperPositions[index].facingLeft = this.flipper.facingLeft;
             flipperPositions[index].scaleX = this.flipper.scaleX;
+            flipperPositions[index].angle = this.flipper.baseAngle;  // Save the flipped angle
             this.scene.registry.set('flippers', flipperPositions);
         }
 
@@ -186,45 +200,28 @@ class FlipperManipulator {
         this.flipButton.x = this.flipper.x + Math.cos(flipButtonAngle) * handleDistance;
         this.flipButton.y = this.flipper.y + Math.sin(flipButtonAngle) * handleDistance;
 
-        // Draw rotation icon (circular arrow) - rotated with flipper
+        // Draw rotation icon (circular arrow) - static orientation
         this.rotationIcon.clear();
         this.rotationIcon.lineStyle(4, 0xFFFFFF, 1);
 
         const iconX = this.rotationHandle.x;
         const iconY = this.rotationHandle.y;
         const radius = 18;
-        const flipperRot = this.flipper.rotation;
-        // baseScaleX and isFlipped already declared above
-        const rotationDirection = isFlipped ? -1 : 1;
 
-        // Draw arc (270 degrees) - relative to flipper rotation, reversed if flipped
+        // Draw arc (270 degrees) - always same orientation
         this.rotationIcon.beginPath();
-        if (isFlipped) {
-            // Draw arc in reverse direction when flipped
-            this.rotationIcon.arc(
-                iconX,
-                iconY,
-                radius,
-                Phaser.Math.DegToRad(225) - flipperRot,
-                Phaser.Math.DegToRad(-45) - flipperRot,
-                true
-            );
-        } else {
-            this.rotationIcon.arc(
-                iconX,
-                iconY,
-                radius,
-                Phaser.Math.DegToRad(-45) + flipperRot,
-                Phaser.Math.DegToRad(225) + flipperRot,
-                false
-            );
-        }
+        this.rotationIcon.arc(
+            iconX,
+            iconY,
+            radius,
+            Phaser.Math.DegToRad(-45),
+            Phaser.Math.DegToRad(225),
+            false
+        );
         this.rotationIcon.strokePath();
 
-        // Draw arrowhead - rotated with flipper, reversed if flipped
-        const arrowAngle = isFlipped
-            ? Phaser.Math.DegToRad(-45) - flipperRot
-            : Phaser.Math.DegToRad(225) + flipperRot;
+        // Draw arrowhead - always at bottom-left
+        const arrowAngle = Phaser.Math.DegToRad(225);
         const arrowX = iconX + Math.cos(arrowAngle) * radius;
         const arrowY = iconY + Math.sin(arrowAngle) * radius;
         const arrowSize = 9;
@@ -232,29 +229,18 @@ class FlipperManipulator {
         this.rotationIcon.fillStyle(0xFFFFFF, 1);
         this.rotationIcon.beginPath();
         this.rotationIcon.moveTo(arrowX, arrowY);
-        if (isFlipped) {
-            this.rotationIcon.lineTo(
-                arrowX + Math.cos(arrowAngle + Math.PI / 2) * arrowSize,
-                arrowY + Math.sin(arrowAngle + Math.PI / 2) * arrowSize
-            );
-            this.rotationIcon.lineTo(
-                arrowX + Math.cos(arrowAngle + Math.PI) * arrowSize,
-                arrowY + Math.sin(arrowAngle + Math.PI) * arrowSize
-            );
-        } else {
-            this.rotationIcon.lineTo(
-                arrowX + Math.cos(arrowAngle - Math.PI / 2) * arrowSize,
-                arrowY + Math.sin(arrowAngle - Math.PI / 2) * arrowSize
-            );
-            this.rotationIcon.lineTo(
-                arrowX + Math.cos(arrowAngle + Math.PI) * arrowSize,
-                arrowY + Math.sin(arrowAngle + Math.PI) * arrowSize
-            );
-        }
+        this.rotationIcon.lineTo(
+            arrowX + Math.cos(arrowAngle - Math.PI / 2) * arrowSize,
+            arrowY + Math.sin(arrowAngle - Math.PI / 2) * arrowSize
+        );
+        this.rotationIcon.lineTo(
+            arrowX + Math.cos(arrowAngle + Math.PI) * arrowSize,
+            arrowY + Math.sin(arrowAngle + Math.PI) * arrowSize
+        );
         this.rotationIcon.closePath();
         this.rotationIcon.fillPath();
 
-        // Draw flip icon (horizontal double arrow) - rotated with flipper
+        // Draw flip icon (horizontal double arrow) - static orientation
         this.flipIcon.clear();
         this.flipIcon.lineStyle(4, 0xFFFFFF, 1);
         this.flipIcon.fillStyle(0xFFFFFF, 1);
@@ -264,50 +250,28 @@ class FlipperManipulator {
         const arrowWidth = 24;
         const arrowHeight = 9;
 
-        // Helper function to rotate a point around the flip button center
-        // When flipped, mirror the rotation
-        const rotatePoint = (x, y) => {
-            const dx = x - flipX;
-            const dy = y - flipY;
-            const effectiveRot = isFlipped ? -flipperRot : flipperRot;
-            return {
-                x: flipX + dx * Math.cos(effectiveRot) - dy * Math.sin(effectiveRot),
-                y: flipY + dx * Math.sin(effectiveRot) + dy * Math.cos(effectiveRot)
-            };
-        };
-
-        // Left arrow - rotated
-        const leftArrowTip = rotatePoint(flipX - arrowWidth / 2, flipY);
-        const leftArrowTop = rotatePoint(flipX - arrowWidth / 2 + arrowHeight, flipY - arrowHeight);
-        const leftArrowBot = rotatePoint(flipX - arrowWidth / 2 + arrowHeight, flipY + arrowHeight);
-
+        // Left arrow - pointing left
         this.flipIcon.beginPath();
-        this.flipIcon.moveTo(leftArrowTip.x, leftArrowTip.y);
-        this.flipIcon.lineTo(leftArrowTop.x, leftArrowTop.y);
-        this.flipIcon.lineTo(leftArrowBot.x, leftArrowBot.y);
+        this.flipIcon.moveTo(flipX - arrowWidth / 2, flipY);
+        this.flipIcon.lineTo(flipX - arrowWidth / 2 + arrowHeight, flipY - arrowHeight);
+        this.flipIcon.lineTo(flipX - arrowWidth / 2 + arrowHeight, flipY + arrowHeight);
         this.flipIcon.closePath();
         this.flipIcon.fillPath();
 
-        // Right arrow - rotated
-        const rightArrowTip = rotatePoint(flipX + arrowWidth / 2, flipY);
-        const rightArrowTop = rotatePoint(flipX + arrowWidth / 2 - arrowHeight, flipY - arrowHeight);
-        const rightArrowBot = rotatePoint(flipX + arrowWidth / 2 - arrowHeight, flipY + arrowHeight);
-
+        // Right arrow - pointing right
         this.flipIcon.beginPath();
-        this.flipIcon.moveTo(rightArrowTip.x, rightArrowTip.y);
-        this.flipIcon.lineTo(rightArrowTop.x, rightArrowTop.y);
-        this.flipIcon.lineTo(rightArrowBot.x, rightArrowBot.y);
+        this.flipIcon.moveTo(flipX + arrowWidth / 2, flipY);
+        this.flipIcon.lineTo(flipX + arrowWidth / 2 - arrowHeight, flipY - arrowHeight);
+        this.flipIcon.lineTo(flipX + arrowWidth / 2 - arrowHeight, flipY + arrowHeight);
         this.flipIcon.closePath();
         this.flipIcon.fillPath();
 
-        // Line connecting arrows - rotated
-        const lineStart = rotatePoint(flipX - arrowWidth / 2 + arrowHeight, flipY);
-        const lineEnd = rotatePoint(flipX + arrowWidth / 2 - arrowHeight, flipY);
+        // Line connecting arrows
         this.flipIcon.strokeLineShape(new Phaser.Geom.Line(
-            lineStart.x,
-            lineStart.y,
-            lineEnd.x,
-            lineEnd.y
+            flipX - arrowWidth / 2 + arrowHeight,
+            flipY,
+            flipX + arrowWidth / 2 - arrowHeight,
+            flipY
         ));
     }
 
