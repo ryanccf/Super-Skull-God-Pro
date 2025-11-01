@@ -214,8 +214,8 @@ class ShopRefactored extends Phaser.Scene {
             if (upgradeType === 'prestige') {
                 this.scene.start('MainMenu');
             } else {
-                // Restart scene to show new items (like original shop)
-                this.scene.restart();
+                // Update header and all buttons without restarting (preserves animations)
+                this.updateUI();
             }
         } else {
             // Show error feedback
@@ -224,6 +224,23 @@ class ShopRefactored extends Phaser.Scene {
             } else if (result.reason === 'needs_placement') {
                 console.log('No space available!');
             }
+        }
+    }
+
+    updateUI() {
+        // Update header
+        if (this.header) {
+            const totalSkulls = this.registry.get('totalSkulls');
+            const skullsPerSecond = this.registry.get('skullsPerSecond') || 0;
+            this.header.skullsText.setText(`Skulls: ${formatScore(totalSkulls)}`);
+            this.header.statsText.setText(`Per Second: ${formatScore(skullsPerSecond)}`);
+        }
+
+        // Update all upgrade buttons
+        if (this.upgradeButtons) {
+            this.upgradeButtons.forEach(button => {
+                button.refresh();
+            });
         }
     }
 

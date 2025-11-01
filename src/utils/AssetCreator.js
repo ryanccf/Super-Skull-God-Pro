@@ -80,24 +80,51 @@ class AssetCreator {
     static createBasket(scene) {
         const basketCanvas = scene.add.graphics();
 
-        // Draw basket as a tall arc/cup shape, centered in texture
-        // The basket body (sides)
+        // Base color for basket
         basketCanvas.fillStyle(0xB34E00);  // Dark orange from palette
-        basketCanvas.fillRect(5, 0, 70, 180);  // Tall rectangular body
+        basketCanvas.fillRect(5, 0, 70, 30);  // Base rectangular body
 
         // Rounded bottom
         basketCanvas.beginPath();
-        basketCanvas.arc(40, 180, 35, 0, Math.PI, true);  // Bottom arc
+        basketCanvas.arc(40, 30, 35, 0, Math.PI, true);  // Bottom arc
         basketCanvas.fillPath();
 
-        // Border/outline
-        basketCanvas.lineStyle(4, 0x8B3A00);  // Darker orange
-        basketCanvas.strokeRect(5, 0, 70, 180);  // Outline the sides
-        basketCanvas.beginPath();
-        basketCanvas.arc(40, 180, 35, 0, Math.PI, true);  // Bottom arc outline
-        basketCanvas.strokePath();
+        // Create weave pattern
+        const weaveColor = 0x8B3A00;  // Darker orange for weave
+        basketCanvas.fillStyle(weaveColor);
 
-        basketCanvas.generateTexture('basket', 80, 200);
+        // Horizontal weave strips
+        for (let y = 0; y < 30; y += 6) {
+            for (let x = 5; x < 75; x += 12) {
+                basketCanvas.fillRect(x, y, 6, 3);
+            }
+        }
+
+        // Vertical weave strips
+        for (let x = 5; x < 75; x += 6) {
+            for (let y = 3; y < 30; y += 12) {
+                basketCanvas.fillRect(x, y, 3, 6);
+            }
+        }
+
+        // Weave pattern on rounded bottom
+        for (let angle = 0; angle < Math.PI; angle += 0.3) {
+            const x1 = 40 + Math.cos(angle) * 35;
+            const y1 = 30 + Math.sin(angle) * 35;
+            const x2 = 40 + Math.cos(angle + Math.PI) * 35;
+            const y2 = 30 + Math.sin(angle + Math.PI) * 35;
+            basketCanvas.lineStyle(2, weaveColor);
+            basketCanvas.beginPath();
+            basketCanvas.moveTo(x1, y1);
+            basketCanvas.lineTo(x2, y2);
+            basketCanvas.strokePath();
+        }
+
+        // Border/outline on sides only
+        basketCanvas.lineStyle(3, 0x000000);
+        basketCanvas.strokeRect(5, 0, 70, 30);  // Outline the sides
+
+        basketCanvas.generateTexture('basket', 80, 50);
         basketCanvas.destroy();
     }
 

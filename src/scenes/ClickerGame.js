@@ -430,12 +430,12 @@ class ClickerGame extends Phaser.Scene {
     createBaskets() {
         const basketPositions = this.registry.get('baskets');
         basketPositions.forEach(pos => {
-            const basket = this.add.image(pos.x, pos.y, 'basket');
+            const basket = this.add.image(pos.x, pos.y + 75, 'basket');
             basket.setInteractive({ draggable: true });
 
-            // Create Matter body - tall rectangle matching the visual basket
+            // Create Matter body - shallow rectangle matching the visual basket
             this.matter.add.gameObject(basket, {
-                shape: { type: 'rectangle', width: 70, height: 180 },
+                shape: { type: 'rectangle', width: 70, height: 50 },
                 isStatic: true,
                 label: 'basket',
                 isSensor: true,  // Baskets are sensors (trigger zones)
@@ -468,8 +468,8 @@ class ClickerGame extends Phaser.Scene {
 
             // Allow any position - no overlap checking
             basket.x = dragX;
-            basket.y = originalPos.y;
-            this.matter.body.setPosition(basket.body, { x: dragX, y: originalPos.y });
+            basket.y = originalPos.y + 75;
+            this.matter.body.setPosition(basket.body, { x: dragX, y: originalPos.y + 75 });
             lastValidX = dragX;
 
             if (index !== -1 && basketPositions[index]) {
