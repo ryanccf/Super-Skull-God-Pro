@@ -13,6 +13,88 @@ const GAME_CONFIG = {
     }
 };
 
+/**
+ * Format a number with commas and round to nearest whole number
+ */
+function formatScore(value) {
+    const rounded = Math.round(value);
+    return rounded.toLocaleString('en-US');
+}
+
+/**
+ * Create a slow color-changing overlay for atmospheric effect
+ * @param {Phaser.Scene} scene - The scene to add the overlay to
+ * @returns {Object} - Object containing the overlay graphics and cleanup function
+ */
+function createColorOverlay(scene) {
+    // Create graphics for overlay
+    const overlay = scene.add.graphics();
+    overlay.setDepth(0.5); // Just above background, below all UI
+
+    // Initial color (semi-transparent purple)
+    let currentColor = { r: 138, g: 43, b: 226, a: 0.15 };
+
+    // Define color sequence (RGB values)
+    const colors = [
+        { r: 138, g: 43, b: 226 },   // Purple
+        { r: 75, g: 0, b: 130 },     // Indigo
+        { r: 0, g: 0, b: 139 },      // Dark Blue
+        { r: 72, g: 61, b: 139 },    // Dark Slate Blue
+        { r: 138, g: 43, b: 226 }    // Back to Purple
+    ];
+
+    let colorIndex = 0;
+
+    // Function to redraw overlay
+    const redrawOverlay = () => {
+        overlay.clear();
+        const hexColor = Phaser.Display.Color.GetColor(
+            Math.round(currentColor.r),
+            Math.round(currentColor.g),
+            Math.round(currentColor.b)
+        );
+        overlay.fillStyle(hexColor, currentColor.a);
+        overlay.fillRect(0, 0, GAME_CONFIG.WORLD_WIDTH, GAME_CONFIG.WORLD_HEIGHT);
+    };
+
+    // Initial draw
+    redrawOverlay();
+
+    // Create tween chain for color transitions
+    const createColorTween = () => {
+        const nextIndex = (colorIndex + 1) % colors.length;
+        const targetColor = colors[nextIndex];
+
+        scene.tweens.add({
+            targets: currentColor,
+            r: targetColor.r,
+            g: targetColor.g,
+            b: targetColor.b,
+            duration: 8000, // 8 seconds per transition
+            ease: 'Sine.easeInOut',
+            onUpdate: redrawOverlay,
+            onComplete: () => {
+                colorIndex = nextIndex;
+                if (scene.scene.isActive()) {
+                    createColorTween(); // Continue the loop
+                }
+            }
+        });
+    };
+
+    // Start the color animation
+    createColorTween();
+
+    // Return cleanup function
+    return {
+        overlay,
+        destroy: () => {
+            scene.tweens.killTweensOf(currentColor);
+            overlay.destroy();
+        }
+    };
+}
+
 const CHARACTER_UNLOCKABLES = {
     'Skull Knight': [
         'Skull Helm',

@@ -8,7 +8,7 @@ class PositionManager {
 
         for (let attempts = 0; attempts < 100; attempts++) {
             const x = Phaser.Math.Between(margin, GAME_CONFIG.WORLD_WIDTH - margin);
-            const y = 720; // Aligned with new floor height (FLOOR_Y = 740, basket sits 20px above)
+            const y = 660; // Raised higher for taller basket to not blend with floor
 
             if (this.isValidPositionFromAll(x, y, currentBaskets, currentBumpers, currentFlippers, currentTriangles)) {
                 return { x, y };

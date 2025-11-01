@@ -14,6 +14,78 @@ class SaveDataService {
         });
     }
 
+    // ===== Save/Load System =====
+
+    /**
+     * Save game data to localStorage
+     */
+    static saveGame(registry) {
+        try {
+            const saveData = {};
+
+            // Save all data from DEFAULT_SAVE_DATA keys
+            Object.keys(DEFAULT_SAVE_DATA).forEach(key => {
+                saveData[key] = registry.get(key);
+            });
+
+            // Store in localStorage
+            localStorage.setItem('skullGodSave', JSON.stringify(saveData));
+            console.log('Game saved successfully');
+            return true;
+        } catch (error) {
+            console.error('Failed to save game:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Load game data from localStorage
+     */
+    static loadGame(registry) {
+        try {
+            const savedData = localStorage.getItem('skullGodSave');
+
+            if (!savedData) {
+                console.log('No save data found, using defaults');
+                return false;
+            }
+
+            const saveData = JSON.parse(savedData);
+
+            // Load all saved data into registry
+            Object.entries(saveData).forEach(([key, value]) => {
+                registry.set(key, value);
+            });
+
+            console.log('Game loaded successfully');
+            return true;
+        } catch (error) {
+            console.error('Failed to load game:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Clear save data from localStorage
+     */
+    static clearSave() {
+        try {
+            localStorage.removeItem('skullGodSave');
+            console.log('Save data cleared');
+            return true;
+        } catch (error) {
+            console.error('Failed to clear save:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Check if save data exists
+     */
+    static hasSaveData() {
+        return localStorage.getItem('skullGodSave') !== null;
+    }
+
     // ===== Currency Management =====
 
     static getTotalSkulls(registry) {

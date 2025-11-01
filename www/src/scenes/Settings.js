@@ -7,7 +7,14 @@ class Settings extends Phaser.Scene {
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
         const centerY = GAME_CONFIG.WORLD_HEIGHT / 2;
 
-        this.add.image(centerX, centerY, 'background');
+        // Setup background
+        const bg = this.add.image(centerX, centerY, 'settings_background');
+        bg.setOrigin(0.5, 0.5);
+        // Scale to cover the entire screen
+        const scaleX = GAME_CONFIG.WORLD_WIDTH / bg.width;
+        const scaleY = GAME_CONFIG.WORLD_HEIGHT / bg.height;
+        const scale = Math.max(scaleX, scaleY);
+        bg.setScale(scale);
 
         // White backdrop for title
         const titleBackdrop = this.add.graphics();
@@ -21,9 +28,15 @@ class Settings extends Phaser.Scene {
         }).setOrigin(0.5);
 
         this.createMuteButtons(centerX);
-        this.createDebugButton(centerX);
         this.createResetButton(centerX);
+        this.createDebugButton(centerX);
         this.createBackButton(centerX);
+
+        // Add Auto-Start UI if unlocked
+        if (this.registry.get('autoStartUnlocked')) {
+            this.createAutoStartUI();
+        }
+
         this.setupInput();
     }
 
@@ -40,7 +53,7 @@ class Settings extends Phaser.Scene {
         const buttonWidth = 300;
         const buttonHeight = 60;
         const buttonSpacing = 80;
-        const startY = 280;
+        const startY = 300;
 
         // Mute Volume button
         this.createMuteButton(centerX, startY, buttonWidth, buttonHeight, 'MUTE VOLUME', 0x4A90E2);
@@ -73,14 +86,18 @@ class Settings extends Phaser.Scene {
     }
 
     createDebugButton(centerX) {
+        const buttonWidth = 300;
+        const buttonHeight = 60;
+        const y = 620;
+
         const debugButtonBg = this.add.graphics();
         debugButtonBg.fillStyle(0xFFD700); // Gold color
-        debugButtonBg.fillRoundedRect(centerX - 200, 460, 400, 50, 10);
+        debugButtonBg.fillRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
         debugButtonBg.lineStyle(3, 0x000000);
-        debugButtonBg.strokeRoundedRect(centerX - 200, 460, 400, 50, 10);
-        debugButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 200, 460, 400, 50), Phaser.Geom.Rectangle.Contains);
+        debugButtonBg.strokeRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
+        debugButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
 
-        this.add.text(centerX, 485, 'DEBUG: Add 1 Million Skulls', {
+        this.add.text(centerX, y, 'DEBUG: +1M Skulls', {
             fontFamily: 'Arial Black',
             fontSize: 22,
             color: '#000000'
@@ -117,27 +134,20 @@ class Settings extends Phaser.Scene {
     }
 
     createResetButton(centerX) {
+        const buttonWidth = 300;
+        const buttonHeight = 60;
+        const y = 540;
+
         const resetButtonBg = this.add.graphics();
         resetButtonBg.fillStyle(0xCC0000);
-        resetButtonBg.fillRoundedRect(centerX - 150, 530, 300, 80, 10);
+        resetButtonBg.fillRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
         resetButtonBg.lineStyle(3, 0x000000);
-        resetButtonBg.strokeRoundedRect(centerX - 150, 530, 300, 80, 10);
-        resetButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 150, 530, 300, 80), Phaser.Geom.Rectangle.Contains);
+        resetButtonBg.strokeRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
+        resetButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
 
-        this.add.text(centerX, 570, 'RESET EVERYTHING', {
+        this.add.text(centerX, y, 'RESET EVERYTHING', {
             fontFamily: 'Arial Black',
-            fontSize: 24,
-            color: '#000000'
-        }).setOrigin(0.5);
-
-        // White backdrop for warning
-        const warningBackdrop = this.add.graphics();
-        warningBackdrop.fillStyle(0xffffff, 0.9);
-        warningBackdrop.fillRoundedRect(centerX - 300, 630, 600, 40, 12);
-
-        this.add.text(centerX, 650, 'Warning: This will reset all your progress!', {
-            fontFamily: 'Arial',
-            fontSize: 20,
+            fontSize: 22,
             color: '#000000'
         }).setOrigin(0.5);
 
@@ -145,14 +155,18 @@ class Settings extends Phaser.Scene {
     }
 
     createBackButton(centerX) {
+        const buttonWidth = 200;
+        const buttonHeight = 60;
+        const y = 710;
+
         const backButtonBg = this.add.graphics();
         backButtonBg.fillStyle(COLORS.ROYAL_BLUE);
-        backButtonBg.fillRoundedRect(centerX - 100, 700, 200, 60, 10);
+        backButtonBg.fillRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
         backButtonBg.lineStyle(3, 0x000000);
-        backButtonBg.strokeRoundedRect(centerX - 100, 700, 200, 60, 10);
-        backButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - 100, 700, 200, 60), Phaser.Geom.Rectangle.Contains);
+        backButtonBg.strokeRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
+        backButtonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
 
-        this.add.text(centerX, 730, 'BACK', {
+        this.add.text(centerX, y, 'BACK', {
             fontFamily: 'Arial Black',
             fontSize: 28,
             color: '#000000'
@@ -162,9 +176,21 @@ class Settings extends Phaser.Scene {
     }
 
     resetGame() {
+        // Clear saved data
+        SaveDataService.clearSave();
+
+        // Reset registry to defaults
         Object.keys(DEFAULT_SAVE_DATA).forEach(key => {
             this.registry.set(key, DEFAULT_SAVE_DATA[key]);
         });
+
         this.scene.start('MainMenu');
+    }
+
+    createAutoStartUI() {
+        // Position in bottom-right corner
+        const x = GAME_CONFIG.WORLD_WIDTH - 270;
+        const y = GAME_CONFIG.WORLD_HEIGHT - 100;
+        this.autoStartUI = new AutoStartUI(this, x, y);
     }
 }

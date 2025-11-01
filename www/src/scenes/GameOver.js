@@ -24,11 +24,14 @@ class GameOver extends Phaser.Scene {
             bg.fillRect(0, 0, GAME_CONFIG.WORLD_WIDTH, GAME_CONFIG.WORLD_HEIGHT);
         }
 
+        // Add color changing overlay
+        this.colorOverlay = createColorOverlay(this);
+
         const message = [
             "Time's Up!",
             "",
-            `Total Skulls: ${totalSkulls}`,
-            `Best Round: ${bestRound}`,
+            `Total Skulls: ${formatScore(totalSkulls)}`,
+            `Best Round: ${formatScore(bestRound)}`,
             "",
             "Click to Continue"
         ].join('\n');
@@ -198,5 +201,11 @@ class GameOver extends Phaser.Scene {
 
     shutdown() {
         this.pauseAutoStartTimer();
+
+        // Cleanup color overlay
+        if (this.colorOverlay) {
+            this.colorOverlay.destroy();
+            this.colorOverlay = null;
+        }
     }
 }

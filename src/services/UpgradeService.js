@@ -47,7 +47,7 @@ class UpgradeService {
                 multiplier: 1.7,
                 registryKey: 'basket',
                 level: SaveDataService.getUpgradeLevel(registry, 'basket'),
-                maxLevel: 10,
+                maxLevel: 25,
                 description: 'Add a skull basket',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -80,7 +80,7 @@ class UpgradeService {
                 multiplier: 1.7,
                 registryKey: 'bumper',
                 level: SaveDataService.getUpgradeLevel(registry, 'bumper'),
-                maxLevel: 15,
+                maxLevel: 25,
                 description: 'Add a bumper',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -113,7 +113,7 @@ class UpgradeService {
                 multiplier: 1.5,
                 registryKey: 'flipper',
                 level: SaveDataService.getUpgradeLevel(registry, 'flipper'),
-                maxLevel: 10,
+                maxLevel: 25,
                 description: 'Add a flipper',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -149,7 +149,7 @@ class UpgradeService {
                 multiplier: 1.5,
                 registryKey: 'triangle',
                 level: SaveDataService.getUpgradeLevel(registry, 'triangle'),
-                maxLevel: 10,
+                maxLevel: 25,
                 description: 'Add a board',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -183,7 +183,7 @@ class UpgradeService {
                 multiplier: 1.5,
                 registryKey: 'booster',
                 level: SaveDataService.getUpgradeLevel(registry, 'booster'),
-                maxLevel: 6,
+                maxLevel: 25,
                 description: 'Add a speed booster',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -219,7 +219,7 @@ class UpgradeService {
                 multiplier: 1.5,
                 registryKey: 'shrinker',
                 level: SaveDataService.getUpgradeLevel(registry, 'shrinker'),
-                maxLevel: 6,
+                maxLevel: 25,
                 description: 'Add a skull shrinker',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -254,7 +254,7 @@ class UpgradeService {
                 multiplier: 1.5,
                 registryKey: 'portal',
                 level: SaveDataService.getUpgradeLevel(registry, 'portal'),
-                maxLevel: 4,
+                maxLevel: 25,
                 description: 'Add a portal pair',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -290,7 +290,7 @@ class UpgradeService {
                 multiplier: 1.5,
                 registryKey: 'duplicator',
                 level: SaveDataService.getUpgradeLevel(registry, 'duplicator'),
-                maxLevel: 3,
+                // No maxLevel - limited by maxDuplicators (3 + prestige bonuses)
                 description: 'Add a skull duplicator',
                 getValue: (level) => {
                     if (level === 0) return '';
@@ -327,7 +327,7 @@ class UpgradeService {
                 basePrice: 100,
                 registryKey: 'autoStart',
                 level: SaveDataService.getAutoStartLevel(registry),
-                maxLevel: 9,
+                maxLevel: 25,
                 description: 'Auto-restart rounds',
                 getValue: (level) => {
                     const unlocked = SaveDataService.getAutoStartUnlocked(registry);

@@ -79,15 +79,25 @@ class AssetCreator {
 
     static createBasket(scene) {
         const basketCanvas = scene.add.graphics();
+
+        // Draw basket as a tall arc/cup shape, centered in texture
+        // The basket body (sides)
         basketCanvas.fillStyle(0xB34E00);  // Dark orange from palette
+        basketCanvas.fillRect(5, 0, 70, 180);  // Tall rectangular body
+
+        // Rounded bottom
         basketCanvas.beginPath();
-        basketCanvas.arc(40, 35, 35, 0, Math.PI, false);
+        basketCanvas.arc(40, 180, 35, 0, Math.PI, true);  // Bottom arc
         basketCanvas.fillPath();
+
+        // Border/outline
         basketCanvas.lineStyle(4, 0x8B3A00);  // Darker orange
+        basketCanvas.strokeRect(5, 0, 70, 180);  // Outline the sides
         basketCanvas.beginPath();
-        basketCanvas.arc(40, 35, 35, 0, Math.PI, false);
+        basketCanvas.arc(40, 180, 35, 0, Math.PI, true);  // Bottom arc outline
         basketCanvas.strokePath();
-        basketCanvas.generateTexture('basket', 80, 50);
+
+        basketCanvas.generateTexture('basket', 80, 200);
         basketCanvas.destroy();
     }
 

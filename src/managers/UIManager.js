@@ -44,7 +44,7 @@ class UIManager {
     createSkullCountDisplay(x, y) {
         const totalSkulls = SaveDataService.getTotalSkulls(this.scene.registry);
         const panel = this.createPanel(x, y, 460, 60);
-        const text = this.createText(x + 428, y + 12, `Total Skulls: ${totalSkulls}`, 'TITLE');
+        const text = this.createText(x + 428, y + 12, `Total Skulls: ${formatScore(totalSkulls)}`, 'TITLE');
         text.setOrigin(1, 0);
 
         return { panel, text };
@@ -64,7 +64,7 @@ class UIManager {
         const titleText = this.createText(centerX, 60, title, 'HEADER');
         titleText.setOrigin(0.5);
 
-        const skullsText = this.createText(centerX, 120, `Your Skulls: ${totalSkulls}`, 'BODY');
+        const skullsText = this.createText(centerX, 120, `Your Skulls: ${formatScore(totalSkulls)}`, 'BODY');
         skullsText.setOrigin(0.5);
 
         const statsText = this.createText(centerX, 160, `Max Skulls: ${maxSkulls} | Game Time: ${gameTime}s`, 'BODY');
@@ -109,7 +109,7 @@ class UIManager {
      */
     updateSkullCount(textElement) {
         const totalSkulls = SaveDataService.getTotalSkulls(this.scene.registry);
-        textElement.setText(`Total Skulls: ${totalSkulls}`);
+        textElement.setText(`Total Skulls: ${formatScore(totalSkulls)}`);
     }
 
     /**

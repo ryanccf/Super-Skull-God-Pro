@@ -15,6 +15,9 @@ class Altar extends Phaser.Scene {
         const scale = Math.max(scaleX, scaleY);
         bg.setScale(scale);
 
+        // Add color changing overlay
+        this.colorOverlay = createColorOverlay(this);
+
         // Add black square
         const squareSize = 300;
         const squareY = centerY - 180;
@@ -49,7 +52,7 @@ class Altar extends Phaser.Scene {
         skullBackdrop.fillStyle(0xffffff, 0.9);
         skullBackdrop.fillRoundedRect(GAME_CONFIG.WORLD_WIDTH - 480, 20, 460, 60, 12);
 
-        this.add.text(GAME_CONFIG.WORLD_WIDTH - 32, 32, `Total Skulls: ${totalSkulls}`, {
+        this.add.text(GAME_CONFIG.WORLD_WIDTH - 32, 32, `Total Skulls: ${formatScore(totalSkulls)}`, {
             fontFamily: 'Arial Black',
             fontSize: 38,
             color: '#000000'
@@ -1061,6 +1064,14 @@ class Altar extends Phaser.Scene {
                 const currentFlipperBonus = this.registry.get('cardBonusFlipperAddition') || 0;
                 this.registry.set('cardBonusFlipperAddition', currentFlipperBonus + 1);
                 break;
+        }
+    }
+
+    shutdown() {
+        // Cleanup color overlay
+        if (this.colorOverlay) {
+            this.colorOverlay.destroy();
+            this.colorOverlay = null;
         }
     }
 }

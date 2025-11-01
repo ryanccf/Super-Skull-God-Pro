@@ -10,13 +10,16 @@ class ShopRefactored extends Phaser.Scene {
     create() {
         // Setup background
         const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
-        const bg = this.add.image(centerX, GAME_CONFIG.WORLD_HEIGHT / 2, 'game_background');
+        const bg = this.add.image(centerX, GAME_CONFIG.WORLD_HEIGHT / 2, 'shop_background');
         bg.setOrigin(0.5, 0.5); // Explicitly center the background
         // Scale to cover the entire screen
         const scaleX = GAME_CONFIG.WORLD_WIDTH / bg.width;
         const scaleY = GAME_CONFIG.WORLD_HEIGHT / bg.height;
         const scale = Math.max(scaleX, scaleY);
         bg.setScale(scale);
+
+        // Add color changing overlay
+        this.colorOverlay = createColorOverlay(this);
 
         // Create managers
         this.uiManager = new UIManager(this);
@@ -28,8 +31,45 @@ class ShopRefactored extends Phaser.Scene {
         this.createNavigationButtons();
     }
 
+    shutdown() {
+        // Cleanup color overlay
+        if (this.colorOverlay) {
+            this.colorOverlay.destroy();
+            this.colorOverlay = null;
+        }
+    }
+
     createHeader() {
         this.header = this.uiManager.createHeader('SKULL SHOP');
+
+        // Move header up and left by 2%
+        const offsetX = GAME_CONFIG.WORLD_WIDTH * 0.02;
+        const offsetY = GAME_CONFIG.WORLD_HEIGHT * 0.02;
+        const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+
+        // Adjust header backdrop position
+        this.header.backdrop.setPanelBounds(
+            centerX - 350 - offsetX,
+            30 - offsetY,
+            700,
+            150
+        );
+
+        // Adjust text positions
+        this.header.titleText.setPosition(centerX - offsetX, 60 - offsetY);
+        this.header.skullsText.setPosition(centerX - offsetX, 120 - offsetY);
+        this.header.statsText.setPosition(centerX - offsetX, 160 - offsetY);
+
+        // Add breathing animation to header elements
+        this.tweens.add({
+            targets: [this.header.backdrop, this.header.titleText, this.header.skullsText, this.header.statsText],
+            scaleX: 1.03,
+            scaleY: 1.03,
+            duration: 3000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
     }
 
     createUpgradeButtons() {
@@ -45,25 +85,38 @@ class ShopRefactored extends Phaser.Scene {
 
         this.upgradeButtons = [];
 
-        // Left section: Upgrades
-        const leftX = centerX - 350;
-        const leftSectionY = 200;
+        // Offset boxes up and left by 2%
+        const offsetX = GAME_CONFIG.WORLD_WIDTH * 0.02;
+        const offsetY = GAME_CONFIG.WORLD_HEIGHT * 0.02;
 
-        // Create bordered panel for upgrades
+        // Left section: Upgrades
+        const leftX = centerX - 350 - offsetX;
+        const leftSectionY = 200 - offsetY;
+
+        // Create panel for upgrades (no border)
         const upgradesPanelWidth = 340;
         const upgradesPanelHeight = 460;
         const upgradesPanel = this.add.graphics();
-        upgradesPanel.fillStyle(0xffffff, 0.85);
+        upgradesPanel.fillStyle(0xffffff, 0.9);
         upgradesPanel.fillRoundedRect(leftX - upgradesPanelWidth/2, leftSectionY, upgradesPanelWidth, upgradesPanelHeight, 12);
-        upgradesPanel.lineStyle(4, 0x000000);
-        upgradesPanel.strokeRoundedRect(leftX - upgradesPanelWidth/2, leftSectionY, upgradesPanelWidth, upgradesPanelHeight, 12);
 
         // Section header
-        this.add.text(leftX, leftSectionY + 30, 'UPGRADES', {
+        const upgradesHeader = this.add.text(leftX, leftSectionY + 30, 'UPGRADES', {
             fontFamily: 'Arial Black',
             fontSize: 28,
             color: '#000000'
         }).setOrigin(0.5);
+
+        // Add breathing animation
+        this.tweens.add({
+            targets: [upgradesPanel, upgradesHeader],
+            scaleX: 1.03,
+            scaleY: 1.03,
+            duration: 3000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
 
         // Create upgrade buttons
         upgradesSection.forEach((upgradeType, index) => {
@@ -79,24 +132,33 @@ class ShopRefactored extends Phaser.Scene {
         });
 
         // Right section: Items (50% wider)
-        const rightX = centerX + 265;
-        const rightSectionY = 200;
+        const rightX = centerX + 265 - offsetX;
+        const rightSectionY = 200 - offsetY;
 
-        // Create bordered panel for items (50% wider: 340 * 1.5 = 510)
+        // Create panel for items (50% wider: 340 * 1.5 = 510, no border)
         const itemsPanelWidth = 510;
         const itemsPanelHeight = 460;
         const itemsPanel = this.add.graphics();
-        itemsPanel.fillStyle(0xffffff, 0.85);
+        itemsPanel.fillStyle(0xffffff, 0.9);
         itemsPanel.fillRoundedRect(rightX - itemsPanelWidth/2, rightSectionY, itemsPanelWidth, itemsPanelHeight, 12);
-        itemsPanel.lineStyle(4, 0x000000);
-        itemsPanel.strokeRoundedRect(rightX - itemsPanelWidth/2, rightSectionY, itemsPanelWidth, itemsPanelHeight, 12);
 
         // Section header
-        this.add.text(rightX, rightSectionY + 30, 'ITEMS', {
+        const itemsHeader = this.add.text(rightX, rightSectionY + 30, 'ITEMS', {
             fontFamily: 'Arial Black',
             fontSize: 28,
             color: '#000000'
         }).setOrigin(0.5);
+
+        // Add breathing animation
+        this.tweens.add({
+            targets: [itemsPanel, itemsHeader],
+            scaleX: 1.03,
+            scaleY: 1.03,
+            duration: 3000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
 
         // Create item buttons (2 columns within the section)
         const itemsPerColumn = 4;

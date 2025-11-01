@@ -13,6 +13,14 @@ const GAME_CONFIG = {
     }
 };
 
+/**
+ * Format a number with commas and round to nearest whole number
+ */
+function formatScore(value) {
+    const rounded = Math.round(value);
+    return rounded.toLocaleString('en-US');
+}
+
 const CHARACTER_UNLOCKABLES = {
     'Skull Knight': [
         'Skull Helm',

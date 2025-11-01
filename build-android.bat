@@ -21,7 +21,15 @@ xcopy /E /I /Y src www\src >nul
 echo Web files copied successfully!
 echo.
 
-echo [3/3] Copying to Android...
+echo [3/4] Creating web release ZIP...
+REM Delete old ZIP if it exists
+if exist super-skull-god-pro-web.zip del super-skull-god-pro-web.zip
+REM Create new ZIP using PowerShell
+powershell -Command "Compress-Archive -Path www\* -DestinationPath super-skull-god-pro-web.zip -Force"
+echo Web ZIP created: super-skull-god-pro-web.zip
+echo.
+
+echo [4/4] Copying to Android...
 call npx cap copy android
 
 echo.

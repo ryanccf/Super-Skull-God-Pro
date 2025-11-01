@@ -16,20 +16,14 @@ class Preloader extends Phaser.Scene {
         bg.fillStyle(0x028af8, 1);
         bg.fillRect(0, 0, GAME_CONFIG.WORLD_WIDTH, GAME_CONFIG.WORLD_HEIGHT);
 
-        this.add.text(centerX, centerY, 'Loading...', {
-            fontFamily: 'Arial Black',
-            fontSize: 64,
-            color: '#000000',
-            stroke: '#ffffff',
-            strokeThickness: 6
-        }).setOrigin(0.5);
+        // Add Quintuple A Games logo (centered, scaled down)
+        this.logo = this.add.image(centerX, centerY, 'quintuple_a_logo');
+        this.logo.setOrigin(0.5);
+        this.logo.setScale(0.75); // Scaled down
 
-        const progressBar = this.add.rectangle(centerX, centerY + 66, 468, 32);
-        progressBar.setStrokeStyle(2, 0xffffff);
-        const bar = this.add.rectangle(centerX - 230, centerY + 66, 4, 28, 0xffffff);
-
+        // Rotate logo as loading progresses (0° to 360°)
         this.load.on("progress", (progress) => {
-            bar.width = 4 + (460 * progress);
+            this.logo.setRotation(progress * Math.PI * 2); // Full rotation
         });
     }
 
@@ -55,6 +49,7 @@ class Preloader extends Phaser.Scene {
         this.load.image('game_over_background', 'src/assets/images/backgrounds/game_over_background.png');
         this.load.image('altar_background', 'src/assets/images/backgrounds/altar_background.png');
         this.load.image('shop_background', 'src/assets/images/backgrounds/shop_background.png');
+        this.load.image('settings_background', 'src/assets/images/backgrounds/settings_background.jpg');
 
         // Load unlockables for both characters
         CHARACTER_UNLOCKABLES['Skull Knight'].forEach(name => {

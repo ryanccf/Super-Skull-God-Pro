@@ -217,6 +217,148 @@ If your APK is much smaller than expected:
 - Check the build output for errors about "assets" or "packaging"
 - Verify assets exist: `dir android\app\src\main\assets\public\src\assets\images\`
 
+## Building for iOS (iPhone/iPad)
+
+### Prerequisites
+
+- **macOS** (iOS builds require Xcode, which only runs on Mac)
+- **Xcode** installed from the Mac App Store
+- **Apple Developer Account** (free for testing on your own device, paid for App Store)
+- Node.js and npm installed
+
+### Build iOS App
+
+**Option 1: Use the build script (Recommended)**
+```bash
+# From project root - this prepares and opens Xcode
+./build-ios.sh
+```
+
+The script will:
+1. Increment version numbers
+2. Copy files to www/
+3. Sync to iOS project
+4. Open the project in Xcode
+
+**Option 2: Manual steps**
+```bash
+# 1. Copy your current code to www directory
+cp -f index.html www/index.html
+cp -rf src www/
+
+# 2. Copy to iOS project
+npx cap copy ios
+
+# 3. Open in Xcode
+npx cap open ios
+```
+
+### Building in Xcode
+
+Once Xcode opens:
+
+1. **Select your development team:**
+   - Click on the project name in the left sidebar
+   - Go to "Signing & Capabilities"
+   - Select your Apple Developer team from the dropdown
+
+2. **Choose your target device:**
+   - At the top, select your connected iPhone/iPad
+   - Or select an iOS Simulator
+
+3. **Build and Run:**
+   - Click the Play (▶) button to build and install on your device
+   - First time may take a few minutes
+
+4. **For App Store Distribution:**
+   - Go to Product > Archive
+   - Follow the App Store submission wizard
+
+### Testing on Physical Device
+
+To test on your iPhone/iPad without paying for a developer account:
+
+1. Connect your device via USB
+2. In Xcode, select your device from the device list
+3. You may need to enable "Developer Mode" on your iOS device (Settings > Privacy & Security > Developer Mode)
+4. Click Run - Xcode will install and launch the app
+
+**Note:** Free accounts can only install apps for 7 days before they need to be reinstalled.
+
+### Troubleshooting iOS Builds
+
+- **"No matching provisioning profiles found"**: Select your development team in Signing & Capabilities
+- **"Untrusted Developer"**: On your iOS device, go to Settings > General > VPN & Device Management, and trust your developer certificate
+- **Build fails**: Make sure you've run `./build-ios.sh` or manually copied files to www/ and synced with `npx cap copy ios`
+
+## Building for Mac
+
+### Prerequisites
+
+- Node.js and npm installed
+- Python 3 (for local testing)
+
+### Build Web Version for Mac
+
+**Option 1: Use the build script (Recommended)**
+```bash
+# From project root - this creates a web build
+./build-mac.sh
+```
+
+The script will:
+1. Increment version numbers
+2. Copy files to www/
+3. Create a Mac web ZIP (`super-skull-god-pro-mac-web.zip`)
+4. Show distribution options
+
+**Option 2: Manual steps**
+```bash
+# 1. Copy your current code to www directory
+cp -f index.html www/index.html
+cp -rf src www/
+
+# 2. Create ZIP for distribution
+zip -r super-skull-god-pro-mac-web.zip www/
+```
+
+### Distribution Options
+
+**1. Web Build (Works on any Mac browser)**
+- Upload the `www` folder to any web server
+- Or extract `super-skull-god-pro-mac-web.zip`
+- Open `index.html` in Safari, Chrome, or Firefox
+
+**2. Test Locally**
+```bash
+cd www
+python3 -m http.server 8000
+```
+Then open `http://localhost:8000` in your browser
+
+**3. Create a Native Mac App (Optional)**
+
+For a native Mac application, you can use:
+
+**Option A: Electron (Easier)**
+```bash
+npm install -g electron
+# Create Electron wrapper around your web build
+```
+
+**Option B: Tauri (Better Performance)**
+```bash
+# Install Tauri
+# Create native Mac app with Rust backend
+```
+
+### Linux/Unix Build
+
+The same `build-mac.sh` script works on Linux and Unix systems:
+```bash
+./build-mac.sh
+```
+
 ## Game Features
 
 - Physics-based skull collection gameplay
