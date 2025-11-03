@@ -9,6 +9,18 @@ www/
 
 # Build artifacts
 super-skull-god-pro-web.zip
+dist/
+*.AppImage
+*.deb
+*.rpm
+*.exe
+*.zip
+*.dmg
+*.snap
+
+# Electron builder
+out/
+build/resources/
 
 # npm
 package-lock.json

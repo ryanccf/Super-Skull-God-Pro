@@ -31,6 +31,7 @@ class Settings extends Phaser.Scene {
         }).setOrigin(0.5);
 
         this.createMuteButtons(centerX);
+        this.createFullscreenToggle(centerX);
         this.createResetButton(centerX);
         this.createDebugButton(centerX);
         this.createBackButton(centerX);
@@ -88,10 +89,100 @@ class Settings extends Phaser.Scene {
         });
     }
 
+    createFullscreenToggle(centerX) {
+        // Only show fullscreen toggle in desktop/Electron environment
+        const isDesktop = typeof window !== 'undefined' &&
+                         (window.require || navigator.userAgent.includes('Electron'));
+
+        if (!isDesktop) return; // Skip if not desktop
+
+        const buttonWidth = 300;
+        const buttonHeight = 60;
+        const y = 540;
+        const checkboxSize = 30;
+
+        // Get current fullscreen state
+        const isFullscreen = this.registry.get('fullscreenEnabled') || false;
+
+        // Button background
+        const buttonBg = this.add.graphics();
+        buttonBg.fillStyle(0x9B59B6); // Purple color
+        buttonBg.fillRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
+        buttonBg.lineStyle(3, 0x000000);
+        buttonBg.strokeRoundedRect(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight, 10);
+        buttonBg.setInteractive(new Phaser.Geom.Rectangle(centerX - buttonWidth/2, y - buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+
+        // Label text (left aligned)
+        this.add.text(centerX - buttonWidth/2 + 20, y, 'FULLSCREEN', {
+            fontFamily: 'Arial Black',
+            fontSize: 22,
+            color: '#000000'
+        }).setOrigin(0, 0.5);
+
+        // Checkbox background
+        const checkboxBg = this.add.graphics();
+        checkboxBg.fillStyle(0xffffff);
+        checkboxBg.fillRoundedRect(centerX + buttonWidth/2 - checkboxSize - 15, y - checkboxSize/2, checkboxSize, checkboxSize, 5);
+        checkboxBg.lineStyle(3, 0x000000);
+        checkboxBg.strokeRoundedRect(centerX + buttonWidth/2 - checkboxSize - 15, y - checkboxSize/2, checkboxSize, checkboxSize, 5);
+
+        // Checkmark (X shape for checked state)
+        const checkmark = this.add.graphics();
+        if (isFullscreen) {
+            this.drawCheckmark(checkmark, centerX + buttonWidth/2 - checkboxSize - 15, y - checkboxSize/2, checkboxSize);
+        }
+
+        // Store references for toggling
+        this.fullscreenCheckmark = checkmark;
+        this.fullscreenState = isFullscreen;
+
+        // Click handler
+        buttonBg.on('pointerdown', () => {
+            this.toggleFullscreen();
+        });
+    }
+
+    drawCheckmark(graphics, x, y, size) {
+        graphics.clear();
+        graphics.lineStyle(4, 0x000000);
+        // Draw X
+        graphics.beginPath();
+        graphics.moveTo(x + 5, y + 5);
+        graphics.lineTo(x + size - 5, y + size - 5);
+        graphics.strokePath();
+        graphics.beginPath();
+        graphics.moveTo(x + size - 5, y + 5);
+        graphics.lineTo(x + 5, y + size - 5);
+        graphics.strokePath();
+    }
+
+    toggleFullscreen() {
+        this.fullscreenState = !this.fullscreenState;
+        this.registry.set('fullscreenEnabled', this.fullscreenState);
+
+        // Update checkmark visual
+        if (this.fullscreenState) {
+            const centerX = GAME_CONFIG.WORLD_WIDTH / 2;
+            const buttonWidth = 300;
+            const checkboxSize = 30;
+            const y = 540;
+            this.drawCheckmark(this.fullscreenCheckmark, centerX + buttonWidth/2 - checkboxSize - 15, y - checkboxSize/2, checkboxSize);
+        } else {
+            this.fullscreenCheckmark.clear();
+        }
+
+        // Toggle actual fullscreen
+        if (this.scale.isFullscreen) {
+            this.scale.stopFullscreen();
+        } else {
+            this.scale.startFullscreen();
+        }
+    }
+
     createDebugButton(centerX) {
         const buttonWidth = 300;
         const buttonHeight = 60;
-        const y = 620;
+        const y = 690;
 
         const debugButtonBg = this.add.graphics();
         debugButtonBg.fillStyle(0xFFD700); // Gold color
@@ -139,7 +230,7 @@ class Settings extends Phaser.Scene {
     createResetButton(centerX) {
         const buttonWidth = 300;
         const buttonHeight = 60;
-        const y = 540;
+        const y = 610;
 
         const resetButtonBg = this.add.graphics();
         resetButtonBg.fillStyle(0xCC0000);
@@ -160,7 +251,7 @@ class Settings extends Phaser.Scene {
     createBackButton(centerX) {
         const buttonWidth = 200;
         const buttonHeight = 60;
-        const y = 710;
+        const y = 760;
 
         const backButtonBg = this.add.graphics();
         backButtonBg.fillStyle(COLORS.ROYAL_BLUE);

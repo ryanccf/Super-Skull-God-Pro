@@ -1,0 +1,11 @@
+appId: com.quintupleagames.superskullgodpro
+productName: Super Skull God Pro
+files:
+  - index.html
+  - electron-main.js
+  - src/**/*
+win:
+  target: dir
+  icon: icon.png
+directories:
+  output: dist

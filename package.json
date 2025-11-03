@@ -1,12 +1,19 @@
 {
-  "name": "super-coin-god-pro",
+  "name": "super-skull-god-pro",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Super Skull God Pro Championship Edition",
+  "main": "electron-main.js",
   "scripts": {
     "sync": "node scripts/sync.js && npx cap sync",
     "open:android": "npx cap open android",
-    "open:ios": "npx cap open ios"
+    "open:ios": "npx cap open ios",
+    "electron": "electron .",
+    "build:win": "electron-builder --win",
+    "build:win64": "electron-builder --win --x64",
+    "build:linux": "electron-builder --linux",
+    "build:linux-deb": "electron-builder --linux deb",
+    "build:linux-rpm": "electron-builder --linux rpm",
+    "build:all": "electron-builder --win --linux --x64"
   },
   "repository": {
     "type": "git",
@@ -24,5 +31,74 @@
     "@capacitor/cli": "^7.4.3",
     "@capacitor/core": "^7.4.3",
     "@capacitor/ios": "^7.4.3"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.quintupleagames.superskullgodpro",
+    "productName": "Super Skull God Pro",
+    "files": [
+      "index.html",
+      "electron-main.js",
+      "src/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.png",
+      "sign": null,
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
+      "icon": "icon.png",
+      "category": "Game",
+      "description": "Super Skull God Pro Championship Edition - Collect skulls for the Skull God!",
+      "maintainer": "Quintuple A Games",
+      "vendor": "Quintuple A Games",
+      "synopsis": "Arcade clicker game"
+    },
+    "deb": {
+      "depends": [
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3"
+      ]
+    },
+    "rpm": {
+      "depends": [
+        "libXScrnSaver"
+      ]
+    },
+    "directories": {
+      "output": "dist"
+    }
   }
 }
